@@ -6,21 +6,24 @@ Location: `backend/migrations/`
 
 The MVP focuses on **CSV/Excel file upload** with table preview. Only these tables are actively used:
 
-| Table | MVP Usage |
-|-------|-----------|
-| `organizations` | ✅ User's org (required for auth) |
-| `users` | ✅ User accounts with password auth |
-| `upload_sessions` | ✅ Track file upload progress |
-| `user_tables` | ✅ Metadata for user's tables |
-| `etl_operations` | ✅ Audit log for insert/upsert/delete/drop/truncate |
-| `storage_quota` | ✅ Track 1GB / 20 table limits |
+| Table | MVP Usage | Migration |
+|-------|-----------|-----------|
+| `organizations` | ✅ User's org (required for auth) | 001 |
+| `users` | ✅ User accounts with password auth | 001, 003 |
+| `upload_sessions` | ✅ Track file upload progress | 005 |
+| `user_tables` | ✅ Metadata for user's tables | 005 |
+| `etl_operations` | ✅ Audit log for operations | 005 |
+| `storage_quota` | ✅ Track 1GB / 20 table limits | 005 |
 
-**Out of MVP scope** (tables exist but not used):
-- `provisioned_instances` - DWH instance provisioning
-- `etl_templates`, `etl_jobs` - ETL pipeline management
-- `data_products`, `kpi_metrics`, `refresh_jobs` - Data products
-- `data_source_connections` - External data sources
-- `adapter_configs` - Cloud provider configs
+**Out of MVP scope** (dropped by migration 009):
+- `plans` - Subscription plans (future)
+- `adapter_configs` - Cloud provider configs (future)
+- `provisioning_jobs` - DWH instance provisioning (future)
+- `provisioned_instances` - Provisioned warehouses (future)
+- `etl_templates`, `etl_jobs` - ETL pipeline management (future)
+- `data_products`, `kpi_metrics`, `refresh_jobs` - Data products (future)
+- `data_source_connections` - External data sources (future)
+- `audit_log` - Comprehensive audit trail (future)
 
 ## Migration Files
 

@@ -1,5 +1,10 @@
--- Migration: Create data product tables
--- Adds support for data products, KPI metrics, and refresh jobs
+-- Migration 004: DEPRECATED - Data products (out of MVP scope)
+-- Feature: Future phases only
+-- Status: Tables will be dropped by migration 009
+-- This file kept for reference only
+
+-- NOTE: All tables in this migration are OUT OF SCOPE for MVP
+-- They will be created in future phases when data products feature is implemented
 
 -- Data Source Connections (extends provisioned_instances concept for data sources)
 CREATE TABLE IF NOT EXISTS data_source_connections (
