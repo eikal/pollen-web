@@ -1,0 +1,51 @@
+order_id,customer_name,product,quantity,unit_price,total_amount,order_date,region
+ORD-001,Acme Corporation,Widget Pro,10,49.99,499.90,2025-11-01,North
+ORD-002,TechStart Inc,Gadget Basic,5,29.99,149.95,2025-11-01,South
+ORD-003,Global Traders,Widget Pro,25,49.99,1249.75,2025-11-02,East
+ORD-004,Local Shop,Gadget Premium,3,99.99,299.97,2025-11-02,West
+ORD-005,Acme Corporation,Gadget Basic,15,29.99,449.85,2025-11-03,North
+ORD-006,Enterprise Solutions,Widget Pro,100,49.99,4999.00,2025-11-03,East
+ORD-007,Small Business Co,Gadget Premium,2,99.99,199.98,2025-11-04,South
+ORD-008,TechStart Inc,Widget Basic,20,19.99,399.80,2025-11-04,South
+ORD-009,Global Traders,Gadget Premium,8,99.99,799.92,2025-11-05,East
+ORD-010,Acme Corporation,Widget Basic,50,19.99,999.50,2025-11-05,North
+ORD-011,Local Shop,Widget Pro,7,49.99,349.93,2025-11-06,West
+ORD-012,Enterprise Solutions,Gadget Basic,30,29.99,899.70,2025-11-06,East
+ORD-013,Small Business Co,Widget Basic,12,19.99,239.88,2025-11-07,South
+ORD-014,TechStart Inc,Gadget Premium,6,99.99,599.94,2025-11-07,South
+ORD-015,Global Traders,Widget Basic,40,19.99,799.60,2025-11-08,East
+ORD-016,Acme Corporation,Gadget Premium,4,99.99,399.96,2025-11-08,North
+ORD-017,Local Shop,Gadget Basic,10,29.99,299.90,2025-11-09,West
+ORD-018,Enterprise Solutions,Widget Pro,50,49.99,2499.50,2025-11-09,East
+ORD-019,Small Business Co,Gadget Basic,8,29.99,239.92,2025-11-10,South
+ORD-020,TechStart Inc,Widget Pro,15,49.99,749.85,2025-11-10,South
+ORD-021,Global Traders,Gadget Premium,12,99.99,1199.88,2025-11-11,East
+ORD-022,Acme Corporation,Widget Basic,25,19.99,499.75,2025-11-11,North
+ORD-023,Local Shop,Widget Pro,5,49.99,249.95,2025-11-12,West
+ORD-024,Enterprise Solutions,Gadget Premium,20,99.99,1999.80,2025-11-12,East
+ORD-025,Small Business Co,Widget Pro,10,49.99,499.90,2025-11-13,South
+ORD-026,TechStart Inc,Gadget Basic,18,29.99,539.82,2025-11-13,South
+ORD-027,Global Traders,Widget Basic,60,19.99,1199.40,2025-11-14,East
+ORD-028,Acme Corporation,Gadget Basic,22,29.99,659.78,2025-11-14,North
+ORD-029,Local Shop,Gadget Premium,3,99.99,299.97,2025-11-15,West
+ORD-030,Enterprise Solutions,Widget Basic,80,19.99,1599.20,2025-11-15,East
+ORD-031,Small Business Co,Gadget Premium,5,99.99,499.95,2025-11-16,South
+ORD-032,TechStart Inc,Widget Basic,35,19.99,699.65,2025-11-16,South
+ORD-033,Global Traders,Widget Pro,45,49.99,2249.55,2025-11-17,East
+ORD-034,Acme Corporation,Gadget Premium,7,99.99,699.93,2025-11-17,North
+ORD-035,Local Shop,Widget Basic,15,19.99,299.85,2025-11-18,West
+ORD-036,Enterprise Solutions,Gadget Basic,40,29.99,1199.60,2025-11-18,East
+ORD-037,Small Business Co,Widget Basic,20,19.99,399.80,2025-11-19,South
+ORD-038,TechStart Inc,Gadget Premium,9,99.99,899.91,2025-11-19,South
+ORD-039,Global Traders,Gadget Basic,25,29.99,749.75,2025-11-20,East
+ORD-040,Acme Corporation,Widget Pro,30,49.99,1499.70,2025-11-20,North
+ORD-041,Local Shop,Gadget Basic,12,29.99,359.88,2025-11-21,West
+ORD-042,Enterprise Solutions,Widget Pro,75,49.99,3749.25,2025-11-21,East
+ORD-043,Small Business Co,Gadget Basic,14,29.99,419.86,2025-11-22,South
+ORD-044,TechStart Inc,Widget Pro,22,49.99,1099.78,2025-11-22,South
+ORD-045,Global Traders,Gadget Premium,15,99.99,1499.85,2025-11-23,East
+ORD-046,Acme Corporation,Widget Basic,45,19.99,899.55,2025-11-23,North
+ORD-047,Local Shop,Widget Pro,8,49.99,399.92,2025-11-24,West
+ORD-048,Enterprise Solutions,Gadget Premium,25,99.99,2499.75,2025-11-24,East
+ORD-049,Small Business Co,Widget Pro,18,49.99,899.82,2025-11-25,South
+ORD-050,TechStart Inc,Gadget Basic,30,29.99,899.70,2025-11-25,South

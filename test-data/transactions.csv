@@ -1,0 +1,101 @@
+transaction_id,transaction_date,description,amount,category,account,is_reconciled
+TXN-0001,2025-11-01,Office Supplies - Staples,-125.50,Office Expenses,Operating Account,true
+TXN-0002,2025-11-01,Client Payment - Acme Corp,5000.00,Revenue,Operating Account,true
+TXN-0003,2025-11-02,Monthly Rent Payment,-2500.00,Rent,Operating Account,true
+TXN-0004,2025-11-02,Software Subscription - Adobe,-59.99,Software,Operating Account,true
+TXN-0005,2025-11-03,Client Payment - TechStart,3500.00,Revenue,Operating Account,true
+TXN-0006,2025-11-03,Utilities - Electric,-180.25,Utilities,Operating Account,true
+TXN-0007,2025-11-04,Travel Expense - Flight,-450.00,Travel,Corporate Card,false
+TXN-0008,2025-11-04,Client Payment - Global Traders,7500.00,Revenue,Operating Account,true
+TXN-0009,2025-11-05,Office Furniture - Desk,-350.00,Equipment,Corporate Card,false
+TXN-0010,2025-11-05,Internet Service - Comcast,-89.99,Utilities,Operating Account,true
+TXN-0011,2025-11-06,Client Payment - Enterprise Solutions,12000.00,Revenue,Operating Account,true
+TXN-0012,2025-11-06,Marketing - Google Ads,-500.00,Marketing,Corporate Card,false
+TXN-0013,2025-11-07,Payroll - November Week 1,-15000.00,Payroll,Payroll Account,true
+TXN-0014,2025-11-07,Client Payment - Local Shop,1500.00,Revenue,Operating Account,true
+TXN-0015,2025-11-08,Insurance Premium,-750.00,Insurance,Operating Account,true
+TXN-0016,2025-11-08,Professional Services - Legal,-1200.00,Professional Services,Operating Account,false
+TXN-0017,2025-11-09,Client Payment - Small Business,2000.00,Revenue,Operating Account,true
+TXN-0018,2025-11-09,Equipment Maintenance,-200.00,Maintenance,Operating Account,true
+TXN-0019,2025-11-10,Shipping - FedEx,-85.50,Shipping,Corporate Card,false
+TXN-0020,2025-11-10,Client Payment - Acme Corp,4500.00,Revenue,Operating Account,true
+TXN-0021,2025-11-11,Software License - Microsoft,-299.99,Software,Operating Account,true
+TXN-0022,2025-11-11,Office Cleaning Service,-150.00,Services,Operating Account,true
+TXN-0023,2025-11-12,Client Payment - TechStart,6000.00,Revenue,Operating Account,true
+TXN-0024,2025-11-12,Phone Service - AT&T,-120.00,Utilities,Operating Account,true
+TXN-0025,2025-11-13,Travel Expense - Hotel,-225.00,Travel,Corporate Card,false
+TXN-0026,2025-11-13,Client Payment - Global Traders,8000.00,Revenue,Operating Account,true
+TXN-0027,2025-11-14,Payroll - November Week 2,-15000.00,Payroll,Payroll Account,true
+TXN-0028,2025-11-14,Marketing - Facebook Ads,-350.00,Marketing,Corporate Card,false
+TXN-0029,2025-11-15,Client Payment - Enterprise Solutions,15000.00,Revenue,Operating Account,true
+TXN-0030,2025-11-15,Training Course - Udemy,-199.00,Training,Corporate Card,false
+TXN-0031,2025-11-16,Office Supplies - Amazon,-75.25,Office Expenses,Corporate Card,false
+TXN-0032,2025-11-16,Client Payment - Local Shop,2500.00,Revenue,Operating Account,true
+TXN-0033,2025-11-17,Bank Service Fees,-35.00,Bank Fees,Operating Account,true
+TXN-0034,2025-11-17,Client Payment - Small Business,3000.00,Revenue,Operating Account,true
+TXN-0035,2025-11-18,Consulting Fee - Contractor,-2000.00,Professional Services,Operating Account,false
+TXN-0036,2025-11-18,Client Payment - Acme Corp,5500.00,Revenue,Operating Account,true
+TXN-0037,2025-11-19,Utilities - Gas,-95.00,Utilities,Operating Account,true
+TXN-0038,2025-11-19,Client Payment - TechStart,4000.00,Revenue,Operating Account,true
+TXN-0039,2025-11-20,Equipment Purchase - Printer,-450.00,Equipment,Corporate Card,false
+TXN-0040,2025-11-20,Client Payment - Global Traders,9000.00,Revenue,Operating Account,true
+TXN-0041,2025-11-21,Payroll - November Week 3,-15000.00,Payroll,Payroll Account,true
+TXN-0042,2025-11-21,Software Subscription - Slack,-15.00,Software,Operating Account,true
+TXN-0043,2025-11-22,Client Payment - Enterprise Solutions,10000.00,Revenue,Operating Account,true
+TXN-0044,2025-11-22,Marketing - LinkedIn Ads,-400.00,Marketing,Corporate Card,false
+TXN-0045,2025-11-23,Travel Expense - Uber,-45.00,Travel,Corporate Card,false
+TXN-0046,2025-11-23,Client Payment - Local Shop,1800.00,Revenue,Operating Account,true
+TXN-0047,2025-11-24,Office Rent - December Advance,-2500.00,Rent,Operating Account,false
+TXN-0048,2025-11-24,Client Payment - Small Business,2200.00,Revenue,Operating Account,true
+TXN-0049,2025-11-25,Interest Income,125.50,Interest,Savings Account,true
+TXN-0050,2025-11-25,Client Payment - Acme Corp,6500.00,Revenue,Operating Account,true
+TXN-0051,2025-11-01,Petty Cash Withdrawal,-100.00,Miscellaneous,Operating Account,true
+TXN-0052,2025-11-02,Coffee Machine Rental,-75.00,Office Expenses,Operating Account,true
+TXN-0053,2025-11-03,Parking Fees,-40.00,Travel,Corporate Card,false
+TXN-0054,2025-11-04,Domain Renewal - GoDaddy,-25.99,Software,Corporate Card,false
+TXN-0055,2025-11-05,Client Refund - Partial,-500.00,Refunds,Operating Account,true
+TXN-0056,2025-11-06,Team Lunch - Catering,-250.00,Meals,Corporate Card,false
+TXN-0057,2025-11-07,Cloud Hosting - AWS,-350.00,Software,Operating Account,true
+TXN-0058,2025-11-08,Health Insurance Premium,-1200.00,Insurance,Operating Account,true
+TXN-0059,2025-11-09,Conference Registration,-599.00,Training,Corporate Card,false
+TXN-0060,2025-11-10,Office Plants - Decor,-85.00,Office Expenses,Corporate Card,false
+TXN-0061,2025-11-11,Client Payment - New Client,1000.00,Revenue,Operating Account,false
+TXN-0062,2025-11-12,Security System Monthly,-150.00,Security,Operating Account,true
+TXN-0063,2025-11-13,Printer Ink/Toner,-120.00,Office Expenses,Corporate Card,false
+TXN-0064,2025-11-14,Client Payment - Referral,750.00,Revenue,Operating Account,false
+TXN-0065,2025-11-15,Water Cooler Service,-45.00,Services,Operating Account,true
+TXN-0066,2025-11-16,Online Course - Coursera,-79.00,Training,Corporate Card,false
+TXN-0067,2025-11-17,Business Cards Print,-65.00,Marketing,Corporate Card,false
+TXN-0068,2025-11-18,Tax Payment - Quarterly,-5000.00,Taxes,Operating Account,true
+TXN-0069,2025-11-19,Client Payment - Settlement,2500.00,Revenue,Operating Account,false
+TXN-0070,2025-11-20,Charity Donation,-200.00,Donations,Operating Account,true
+TXN-0071,2025-11-21,Hardware Upgrade - RAM,-180.00,Equipment,Corporate Card,false
+TXN-0072,2025-11-22,Client Payment - Project Milestone,8500.00,Revenue,Operating Account,true
+TXN-0073,2025-11-23,Postage/Stamps,-25.00,Office Expenses,Corporate Card,false
+TXN-0074,2025-11-24,Data Backup Service,-99.00,Software,Operating Account,true
+TXN-0075,2025-11-25,Team Building Event,-400.00,Events,Corporate Card,false
+TXN-0076,2025-11-01,Loan Repayment,-1500.00,Loan,Operating Account,true
+TXN-0077,2025-11-05,Office Snacks,-60.00,Meals,Corporate Card,false
+TXN-0078,2025-11-10,VPN Service Annual,-120.00,Software,Operating Account,true
+TXN-0079,2025-11-15,Accounting Software - QuickBooks,-50.00,Software,Operating Account,true
+TXN-0080,2025-11-20,Fire Extinguisher Service,-85.00,Safety,Operating Account,true
+TXN-0081,2025-11-25,Client Payment - Retainer,3000.00,Revenue,Operating Account,true
+TXN-0082,2025-11-02,Pest Control Service,-125.00,Services,Operating Account,true
+TXN-0083,2025-11-07,Networking Event Tickets,-150.00,Events,Corporate Card,false
+TXN-0084,2025-11-12,File Storage - Dropbox,-20.00,Software,Operating Account,true
+TXN-0085,2025-11-17,Employee Gift Cards,-300.00,Employee Benefits,Corporate Card,false
+TXN-0086,2025-11-22,Toll Fees,-15.00,Travel,Corporate Card,false
+TXN-0087,2025-11-03,Magazine Subscription,-35.00,Subscriptions,Operating Account,true
+TXN-0088,2025-11-08,Window Cleaning,-100.00,Services,Operating Account,true
+TXN-0089,2025-11-13,CRM Software - HubSpot,-200.00,Software,Operating Account,true
+TXN-0090,2025-11-18,Client Payment - Bonus,1500.00,Revenue,Operating Account,false
+TXN-0091,2025-11-23,Office Keys Duplicate,-20.00,Miscellaneous,Corporate Card,false
+TXN-0092,2025-11-04,Recycling Service,-50.00,Services,Operating Account,true
+TXN-0093,2025-11-09,Video Conferencing - Zoom,-15.00,Software,Operating Account,true
+TXN-0094,2025-11-14,Client Payment - Final,-4500.00,Revenue,Operating Account,true
+TXN-0095,2025-11-19,First Aid Kit Restock,-45.00,Safety,Corporate Card,false
+TXN-0096,2025-11-24,Client Payment - Deposit,2000.00,Revenue,Operating Account,false
+TXN-0097,2025-11-06,Gym Membership - Corporate,-500.00,Employee Benefits,Operating Account,true
+TXN-0098,2025-11-11,HVAC Maintenance,-350.00,Maintenance,Operating Account,true
+TXN-0099,2025-11-16,Project Management Tool,-30.00,Software,Operating Account,true
+TXN-0100,2025-11-21,Client Payment - Recurring,5000.00,Revenue,Operating Account,true

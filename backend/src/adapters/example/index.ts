@@ -1,4 +1,4 @@
-import Adapter, { AdapterConfig, ProvisionParams, ProvisionResult, Credentials, JobStatus } from '../interface'
+import Adapter, { AdapterConfig, ProvisionParams, ProvisionResult, Credentials, StatusDetail } from '../interface'
 
 // Example (mock) adapter implementation for local testing and contract demonstration
 export class ExampleAdapter implements Adapter {
@@ -17,15 +17,16 @@ export class ExampleAdapter implements Adapter {
         database: params.instanceName || 'default',
         meta: { provider: 'example' }
       },
-      metadata: { createdAt: new Date().toISOString() }
+      metadata: { createdAt: new Date().toISOString() },
+      created: true
     }
     // in real adapter we'd call provider SDKs here
     return result
   }
 
-  async status(instanceId: string): Promise<JobStatus> {
-    // always return success for mock
-    return 'SUCCESS'
+  async status(instanceId: string): Promise<StatusDetail> {
+    // always return success + simple progress for mock
+    return { status: 'SUCCESS', progress: { current: 1, total: 1 } }
   }
 
   async destroy(instanceId: string): Promise<void> {

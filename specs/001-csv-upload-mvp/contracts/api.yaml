@@ -1,0 +1,648 @@
+openapi: 3.0.3
+info:
+  title: CSV/Excel to Data Warehouse Service API
+  version: 1.0.0
+  description: |
+    REST API for uploading CSV/Excel files and performing ETL operations on user tables.
+    
+    **Authentication**: All endpoints require JWT bearer token.
+    
+    **Error Handling**: Errors return business-friendly messages (see Error Schema).
+    
+    **Rate Limits**: 100 requests/minute per user.
+
+servers:
+  - url: http://localhost:4000/api
+    description: Local development server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /upload:
+    post:
+      summary: Upload CSV/Excel file and create/insert into table
+      description: |
+        Upload a file and insert all rows into a new or existing table.
+        - Creates user schema on first upload
+        - Infers column types from first 1000 rows
+        - Validates against storage quota before processing
+      tags:
+        - ETL Operations
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+                - tableName
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV or Excel file (max 50MB)
+                tableName:
+                  type: string
+                  pattern: '^[a-z][a-z0-9_]{0,62}$'
+                  description: Target table name (lowercase, alphanumeric + underscore)
+                  example: sales_data
+      responses:
+        '200':
+          description: Upload successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '413':
+          $ref: '#/components/responses/FileTooLarge'
+        '507':
+          $ref: '#/components/responses/StorageExceeded'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /upsert:
+    post:
+      summary: Upsert rows into existing table
+      description: |
+        Insert or update rows based on a unique key column.
+        - Key column must exist and be NOT NULL
+        - File must match table schema (column names and types)
+        - Creates unique index on key column if not exists
+      tags:
+        - ETL Operations
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+                - tableName
+                - keyColumn
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV or Excel file (max 50MB)
+                tableName:
+                  type: string
+                  pattern: '^[a-z][a-z0-9_]{0,62}$'
+                  description: Existing table name
+                  example: sales_data
+                keyColumn:
+                  type: string
+                  description: Column name to use for upsert matching
+                  example: product_id
+      responses:
+        '200':
+          description: Upsert successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpsertResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/TableNotFound'
+        '413':
+          $ref: '#/components/responses/FileTooLarge'
+        '507':
+          $ref: '#/components/responses/StorageExceeded'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /tables/{tableName}/rows:
+    delete:
+      summary: Delete rows from table by IDs
+      description: |
+        Delete specific rows by their ID values (comma-separated list).
+        - IDs reference the primary key column (usually `id`)
+        - Non-existent IDs are silently ignored
+        - At least 1 ID required
+      tags:
+        - ETL Operations
+      parameters:
+        - name: tableName
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Table name
+          example: sales_data
+        - name: ids
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Comma-separated list of row IDs to delete
+          example: "1,5,42,103"
+      responses:
+        '200':
+          description: Deletion successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/TableNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /tables/{tableName}:
+    delete:
+      summary: Drop table completely
+      description: |
+        Permanently delete the table and all its data.
+        - Cannot be undone
+        - Updates storage quota immediately
+        - Removes metadata record
+      tags:
+        - ETL Operations
+      parameters:
+        - name: tableName
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Table name to drop
+          example: old_sales_data
+      responses:
+        '200':
+          description: Table dropped successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DropResult'
+        '404':
+          $ref: '#/components/responses/TableNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /tables/{tableName}/data:
+    delete:
+      summary: Truncate table (delete all rows, keep structure)
+      description: |
+        Remove all rows from table while keeping schema intact.
+        - Faster than DELETE for large tables
+        - Updates storage quota immediately
+        - Preserves table metadata
+      tags:
+        - ETL Operations
+      parameters:
+        - name: tableName
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Table name to truncate
+          example: staging_data
+      responses:
+        '200':
+          description: Table truncated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TruncateResult'
+        '404':
+          $ref: '#/components/responses/TableNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /tables:
+    get:
+      summary: List all user tables
+      description: |
+        Get metadata for all tables owned by authenticated user.
+        - Includes row counts and storage sizes (cached values)
+        - Sorted by last update time (newest first)
+      tags:
+        - Metadata
+      responses:
+        '200':
+          description: Table list retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tables:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TableMetadata'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /tables/{tableName}/preview:
+    get:
+      summary: Preview first 100 rows of table
+      description: |
+        Get sample data from table for UI display.
+        - Returns first 100 rows ordered by primary key
+        - Includes column names and types
+        - Timeout: 30 seconds
+      tags:
+        - Metadata
+      parameters:
+        - name: tableName
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Table name
+          example: sales_data
+      responses:
+        '200':
+          description: Preview data retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TablePreview'
+        '404':
+          $ref: '#/components/responses/TableNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /quota:
+    get:
+      summary: Get current storage quota usage
+      description: |
+        Retrieve user's storage consumption and limits.
+        - Cached values (refreshed every 5 minutes)
+        - Warning threshold: 80% of limit
+      tags:
+        - Metadata
+      responses:
+        '200':
+          description: Quota information retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaStatus'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /operations:
+    get:
+      summary: Get ETL operation history
+      description: |
+        List recent ETL operations for authenticated user.
+        - Last 90 days only
+        - Paginated results (20 per page)
+        - Sorted by timestamp (newest first)
+      tags:
+        - Metadata
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          description: Page number
+        - name: tableName
+          in: query
+          schema:
+            type: string
+          description: Filter by table name (optional)
+      responses:
+        '200':
+          description: Operation history retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationHistory'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UploadResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "File uploaded successfully. 1,250 rows added to 'sales_data'."
+        tableName:
+          type: string
+          example: sales_data
+        rowsInserted:
+          type: integer
+          example: 1250
+        tableSizeMB:
+          type: number
+          format: float
+          example: 0.45
+        operationId:
+          type: string
+          format: uuid
+          description: Audit log ID
+
+    UpsertResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Upsert completed. 320 rows updated, 80 rows added."
+        tableName:
+          type: string
+          example: sales_data
+        rowsUpdated:
+          type: integer
+          example: 320
+        rowsInserted:
+          type: integer
+          example: 80
+        operationId:
+          type: string
+          format: uuid
+
+    DeleteResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "3 rows deleted from 'sales_data'."
+        tableName:
+          type: string
+          example: sales_data
+        rowsDeleted:
+          type: integer
+          example: 3
+        operationId:
+          type: string
+          format: uuid
+
+    DropResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Table 'old_sales_data' has been permanently deleted."
+        tableName:
+          type: string
+          example: old_sales_data
+        freedSpaceMB:
+          type: number
+          format: float
+          example: 12.3
+        operationId:
+          type: string
+          format: uuid
+
+    TruncateResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "All rows deleted from 'staging_data'. Table structure preserved."
+        tableName:
+          type: string
+          example: staging_data
+        rowsDeleted:
+          type: integer
+          example: 5420
+        operationId:
+          type: string
+          format: uuid
+
+    TableMetadata:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tableName:
+          type: string
+          example: sales_data
+        rowCount:
+          type: integer
+          example: 1250
+        sizeMB:
+          type: number
+          format: float
+          example: 0.45
+        lastUpdated:
+          type: string
+          format: date-time
+          example: "2025-11-15T14:23:00Z"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-11-10T09:00:00Z"
+
+    TablePreview:
+      type: object
+      properties:
+        tableName:
+          type: string
+          example: sales_data
+        columns:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: product_id
+              type:
+                type: string
+                example: integer
+        rows:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          example:
+            - id: 1
+              product_id: 101
+              revenue: 450.50
+              date: "2025-01-15"
+            - id: 2
+              product_id: 102
+              revenue: 320.00
+              date: "2025-01-16"
+
+    QuotaStatus:
+      type: object
+      properties:
+        totalTables:
+          type: integer
+          example: 5
+        tableLimit:
+          type: integer
+          example: 20
+        totalSizeMB:
+          type: number
+          format: float
+          example: 245.7
+        storageLimitMB:
+          type: integer
+          example: 1024
+        usagePercent:
+          type: number
+          format: float
+          example: 24.0
+        warningThreshold:
+          type: boolean
+          description: True if usage >= 80%
+          example: false
+        lastCalculated:
+          type: string
+          format: date-time
+          example: "2025-11-15T14:20:00Z"
+
+    OperationHistory:
+      type: object
+      properties:
+        operations:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              operationType:
+                type: string
+                enum: [insert, upsert, delete, drop, truncate]
+              tableName:
+                type: string
+              status:
+                type: string
+                enum: [success, failed]
+              rowsAffected:
+                type: integer
+              errorMessage:
+                type: string
+                nullable: true
+              createdAt:
+                type: string
+                format: date-time
+        pagination:
+          type: object
+          properties:
+            currentPage:
+              type: integer
+              example: 1
+            totalPages:
+              type: integer
+              example: 3
+            totalRecords:
+              type: integer
+              example: 52
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          description: Business-friendly error message
+          example: "Your storage is full. Please delete some tables to free up space."
+        errorCode:
+          type: string
+          description: Machine-readable error code
+          example: STORAGE_QUOTA_EXCEEDED
+        details:
+          type: object
+          nullable: true
+          description: Additional context (optional)
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            invalidTableName:
+              value:
+                success: false
+                message: "Table name must start with a letter and contain only lowercase letters, numbers, and underscores."
+                errorCode: INVALID_TABLE_NAME
+            missingKeyColumn:
+              value:
+                success: false
+                message: "The key column 'product_id' was not found in your file. Please check the column name."
+                errorCode: KEY_COLUMN_NOT_FOUND
+
+    TableNotFound:
+      description: Table does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            message: "The table 'sales_data' could not be found. It may have been deleted."
+            errorCode: TABLE_NOT_FOUND
+
+    FileTooLarge:
+      description: File exceeds 50MB limit
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            message: "Your file is too large (65MB). Maximum file size is 50MB."
+            errorCode: FILE_TOO_LARGE
+
+    StorageExceeded:
+      description: Storage quota exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            message: "Your storage is full (1024MB used of 1024MB limit). Please delete some tables to free up space."
+            errorCode: STORAGE_QUOTA_EXCEEDED
+
+    InternalError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            message: "An unexpected error occurred. Our team has been notified. Please try again later."
+            errorCode: INTERNAL_ERROR
+
+tags:
+  - name: ETL Operations
+    description: Upload and modify table data
+  - name: Metadata
+    description: Query table information and quota status
