@@ -252,16 +252,16 @@
 
 ### Tasks
 
-- [ ] T067 [P] Audit all new components for Tailwind spacing scale compliance (p-2/4/6/8/12, m-2/4/6/8/12)
-- [ ] T068 [P] Audit typography hierarchy: page titles (text-3xl font-bold), section headers (text-xl font-semibold), labels (text-sm font-medium), helper text (text-xs)
-- [ ] T069 [P] Verify semantic color usage: blue-600 primary, green-600 success, red-600 destructive, yellow-50/600 warnings, gray neutrals
-- [ ] T070 [P] Add focus states to all interactive elements: focus:outline-none focus:ring-2 focus:ring-blue-500
-- [ ] T071 [P] Verify form field structure: left-aligned labels above inputs, helper text below, space-y-2 for field groups
-- [ ] T072 [P] Test responsive design on mobile (320px), tablet (768px), desktop (1024px+)
-- [ ] T073 [P] Validate WCAG 2.1 AA compliance: color contrast, keyboard navigation, ARIA labels
-- [ ] T074 [P] Add loading skeletons to all async data fetch states (credentials, quota, table list)
-- [ ] T075 [P] Verify no overlapping UI elements (check z-index conflicts, modal positioning)
-- [ ] T076 Commit all UI polish changes with message: "feat(ui): enforce design system consistency across DB access and upload features"
+- [x] T067 [P] Audit all new components for Tailwind spacing scale compliance (p-2/4/6/8/12, m-2/4/6/8/12)
+- [x] T068 [P] Audit typography hierarchy: page titles (text-3xl font-bold), section headers (text-xl font-semibold), labels (text-sm font-medium), helper text (text-xs)
+- [x] T069 [P] Verify semantic color usage: blue-600 primary, green-600 success, red-600 destructive, yellow-50/600 warnings, gray neutrals
+- [x] T070 [P] Add focus states to all interactive elements: focus:outline-none focus:ring-2 focus:ring-blue-500
+- [x] T071 [P] Verify form field structure: left-aligned labels above inputs, helper text below, space-y-2 for field groups
+- [x] T072 [P] Test responsive design on mobile (320px), tablet (768px), desktop (1024px+)
+- [x] T073 [P] Validate WCAG 2.1 AA compliance: color contrast, keyboard navigation, ARIA labels
+- [x] T074 [P] Add loading skeletons to all async data fetch states (credentials, quota, table list)
+- [x] T075 [P] Verify no overlapping UI elements (check z-index conflicts, modal positioning)
+- [x] T076 Commit all UI polish changes with message: "feat(ui): enforce design system consistency across DB access and upload features"
 
 **Completion Criteria**: All components use design tokens, no arbitrary px values, WCAG AA compliance verified, responsive on all breakpoints, loading states prevent layout shift
 
