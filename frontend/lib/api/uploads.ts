@@ -107,3 +107,21 @@ export default {
   listTables,
   getPreview,
 };
+
+export async function enumerateExcelSheets(file: File): Promise<string[]> {
+  const token = getToken();
+  if (!token) throw new Error('Not authenticated');
+
+  const form = new FormData();
+  form.append('file', file);
+
+  const res = await fetch(`${API_BASE}/api/uploads/excel/sheets`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  });
+
+  if (!res.ok) throw new Error('Failed to enumerate sheets');
+  const data = await res.json();
+  return data.sheets || [];
+}

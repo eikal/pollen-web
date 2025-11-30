@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { uploadFile, listSessions, UploadSession, OperationType } from '../lib/api/uploads';
+import { uploadFile, listSessions, UploadSession, OperationType, enumerateExcelSheets } from '../lib/api/uploads';
 import { isAuthenticated } from '../lib/auth';
 import Card from './ui/Card';
 import { Button } from './ui/Button';
@@ -20,6 +20,8 @@ export default function UploadWizard({ onUploaded }: Props) {
   const [progress, setProgress] = useState<number>(0);
   const [status, setStatus] = useState<UploadSession['status'] | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [sheets, setSheets] = useState<string[]>([]);
+  const [selectedSheet, setSelectedSheet] = useState<string>('');
 
   const fileHint = 'CSV (.csv) or Excel (.xlsx/.xls), up to 50MB';
 
@@ -67,6 +69,21 @@ export default function UploadWizard({ onUploaded }: Props) {
     setFile(e.target.files[0]);
     setError(null);
     setSuccess(null);
+    setSheets([]);
+    setSelectedSheet('');
+
+    const name = e.target.files[0].name.toLowerCase();
+    if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+      // enumerate sheets for Excel
+      enumerateExcelSheets(e.target.files[0])
+        .then((list) => {
+          setSheets(list);
+          if (list.length > 0) setSelectedSheet(list[0]);
+        })
+        .catch(() => {
+          // silently ignore; user can still upload
+        });
+    }
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -97,6 +114,7 @@ export default function UploadWizard({ onUploaded }: Props) {
         operationType,
         conflictColumns: confCols.length > 0 ? confCols : undefined,
       });
+      // Note: selectedSheet is currently not processed by backend finalize; future work will use this field.
 
       setSessionId(res.sessionId);
       setProgress(10);
@@ -137,6 +155,23 @@ export default function UploadWizard({ onUploaded }: Props) {
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {sheets.length > 0 && (
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wide text-gray-600 mb-1">
+                Excel Sheet
+              </label>
+              <select
+                value={selectedSheet}
+                onChange={(e) => setSelectedSheet(e.target.value)}
+                disabled={isUploading}
+                className="ui-input"
+              >
+                {sheets.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <Input
             label="Table Name (optional)"
             placeholder="Leave blank to use file name"

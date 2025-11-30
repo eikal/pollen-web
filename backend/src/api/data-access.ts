@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticateJWT } from '../middleware/auth';
 import { query } from '../services/db';
+import * as userCreds from '../services/user-credentials';
 import * as schemaService from '../services/schema-service';
 
 const router = Router();
@@ -10,14 +11,7 @@ router.get('/settings/data-access', authenticateJWT, async (req, res) => {
   if (!req.user) return res.status(401).json({ error: 'unauthorized' });
   try {
     const schema = await schemaService.ensureUserSchema(req.user.id);
-
-    // Fetch db username from users table if present; else default to email-based
-    const result = await query<{ db_username?: string }>(
-      'SELECT db_username FROM users WHERE id = $1 LIMIT 1',
-      [req.user.id]
-    );
-    const row = result.rows[0] || {};
-    const username = row.db_username || `user_${req.user.id}`;
+    const { username } = await userCreds.ensureDbUser(req.user.id, schema);
 
     return res.json({
       host: process.env.PGHOST || 'localhost',
@@ -35,11 +29,7 @@ router.get('/settings/data-access', authenticateJWT, async (req, res) => {
 router.post('/settings/data-access/reset-password', authenticateJWT, async (req, res) => {
   if (!req.user) return res.status(401).json({ error: 'unauthorized' });
   try {
-    // Generate a new password and store hash; real implementation should update DB grants as needed
-    const crypto = await import('crypto');
-    const newPassword = crypto.randomBytes(12).toString('hex');
-    // Store hash (placeholder):
-    await query('UPDATE users SET password_hash = $2, updated_at = now() WHERE id = $1', [req.user.id, newPassword]);
+    await userCreds.resetDbPassword(req.user.id);
     return res.status(200).json({ ok: true });
   } catch (error) {
     return res.status(500).json({ error: 'failed to reset password' });
