@@ -13,6 +13,7 @@ export type UploadJobData = {
   tableName: string;
   operationType: 'insert' | 'upsert';
   conflictColumns?: string[];
+  sheet?: string;
 };
 
 let uploadQueue: Queue<UploadJobData> | null = null;

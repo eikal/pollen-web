@@ -113,8 +113,8 @@ export default function UploadWizard({ onUploaded }: Props) {
         tableName: tableName || undefined,
         operationType,
         conflictColumns: confCols.length > 0 ? confCols : undefined,
+        sheet: selectedSheet || undefined,
       });
-      // Note: selectedSheet is currently not processed by backend finalize; future work will use this field.
 
       setSessionId(res.sessionId);
       setProgress(10);

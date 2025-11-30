@@ -23,6 +23,7 @@ export interface UploadJobData {
   tableName: string;
   operationType: 'insert' | 'upsert';
   conflictColumns?: string[]; // For upsert operations
+  sheet?: string; // Excel sheet name
 }
 
 let uploadQueue: Queue<UploadJobData> | null = null;
@@ -128,7 +129,7 @@ export async function enqueueUpload(data: UploadJobData): Promise<string> {
  * Process an upload job.
  */
 async function processUploadJob(job: Job<UploadJobData>): Promise<void> {
-  const { userId, sessionId, filePath, filename, tableName, operationType, conflictColumns } =
+  const { userId, sessionId, filePath, filename, tableName, operationType, conflictColumns, sheet } =
     job.data;
 
   log.info('Processing upload job', {
@@ -177,7 +178,7 @@ async function processUploadJob(job: Job<UploadJobData>): Promise<void> {
     };
 
     // Parse file
-    columns = await fileParser.parseFile(filePath, parseOptions);
+    columns = await fileParser.parseFile(filePath, { ...parseOptions, sheet });
 
     await UploadSession.updateProgress(sessionId, 60);
 

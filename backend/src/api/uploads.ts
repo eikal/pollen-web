@@ -66,6 +66,7 @@ router.post(
         tableName,
         operationType,
         conflictColumns,
+        sheet: req.body?.sheet || undefined,
       };
 
       const queue = getUploadQueue();

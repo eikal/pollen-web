@@ -28,6 +28,7 @@ export async function uploadFile(params: {
   tableName?: string;
   operationType?: OperationType;
   conflictColumns?: string[];
+  sheet?: string;
 }): Promise<UploadResponse> {
   const token = getToken();
   if (!token) throw new Error('Not authenticated');
@@ -39,6 +40,7 @@ export async function uploadFile(params: {
   if (params.conflictColumns && params.conflictColumns.length > 0) {
     form.append('conflictColumns', params.conflictColumns.join(','));
   }
+  if (params.sheet) form.append('sheet', params.sheet);
 
   const res = await fetch(`${API_BASE}/api/uploads`, {
     method: 'POST',
