@@ -113,6 +113,14 @@ export default function Nav() {
             }}>
               My Data
             </Link>
+            <Link href="/upload" style={{ 
+              fontSize: '12px', 
+              fontWeight: 500,
+              color: '#64748b',
+              textDecoration: 'none'
+            }}>
+              Upload
+            </Link>
           </div>
         </div>
 
@@ -212,7 +220,7 @@ export default function Nav() {
                         📂 My Data
                       </Link>
                       <Link
-                        href="/settings/organization"
+                        href="/settings"
                         style={{
                           display: 'flex',
                           alignItems: 'center',

@@ -7,6 +7,7 @@ import * as schemaService from '../services/schema-service';
 import * as etlService from '../services/etl-service';
 import { getUploadQueue, UploadJobData } from '../services/queue';
 import * as log from '../services/log';
+import ExcelJS from 'exceljs';
 
 const router = express.Router();
 
@@ -238,3 +239,19 @@ router.delete('/tables/:table/data', authenticateJWT, async (req: Request, res: 
 });
 
 export default router;
+
+// POST /api/uploads/excel/sheets - enumerate sheets in an uploaded Excel file
+router.post('/excel/sheets', authenticateJWT, upload.single('file'), async (req: Request, res: Response) => {
+  try {
+    if (!req.user) return res.status(401).json({ error: 'unauthorized' });
+    if (!req.file) return res.status(400).json({ error: 'no file' });
+
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(req.file.path);
+    const sheets = workbook.worksheets.map(ws => ws.name).filter(Boolean);
+    return res.json({ sheets });
+  } catch (error) {
+    log.error('Excel sheet enumeration failed', { error: (error as Error).message });
+    return res.status(500).json({ error: 'failed to enumerate sheets' });
+  }
+});
