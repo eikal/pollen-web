@@ -1,14 +1,25 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import React from 'react';
+import Head from 'next/head';
+import Nav from '../components/Nav';
+import TableList from '../components/TableList';
+import GuidancePanel from '../components/GuidancePanel';
 
-export default function MyDataRedirect() {
-  const router = useRouter();
-  useEffect(() => {
-    router.replace('/uploads');
-  }, [router]);
+export default function MyDataPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p className="text-gray-600">Redirecting to My Data…</p>
-    </div>
+    <>
+      <Head>
+        <title>My Data</title>
+      </Head>
+      <Nav />
+      <main className="container mx-auto px-4 py-6">
+        <h1 className="text-2xl font-semibold mb-4">Your Tables</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <TableList />
+          </div>
+          <GuidancePanel />
+        </div>
+      </main>
+    </>
   );
 }

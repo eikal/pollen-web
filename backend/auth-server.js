@@ -32,6 +32,7 @@ require('dotenv').config()
 // const dataProductsRouter = require('./dist/api/data-products').default  // Out of MVP scope
 const uploadsRouter = require('./dist/api/uploads').default
 const quotaRouter = require('./dist/api/quota').default
+const dataAccessRouter = require('./dist/api/data-access').default
 
 const app = express()
 const PORT = process.env.PORT || 4000
@@ -56,6 +57,7 @@ app.use(bodyParser.json())
 // app.use('/api/data-products', dataProductsRouter)  // Out of MVP scope
 app.use('/api/uploads', uploadsRouter)
 app.use('/api/quota', quotaRouter)
+app.use('/api', dataAccessRouter)
 
 function generateToken(user) {
   return jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' })
