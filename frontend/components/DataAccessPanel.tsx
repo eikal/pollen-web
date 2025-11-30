@@ -91,7 +91,7 @@ export default function DataAccessPanel() {
                   <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Password</span>
                 </div>
                 <button
-                  className="text-xs px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-150 font-semibold shadow-sm hover:shadow"
+                  className="text-xs px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all font-semibold shadow-sm hover:shadow"
                   onClick={async () => {
                     const token = localStorage.getItem('pollen_token');
                     if (!token) return;
@@ -107,7 +107,7 @@ export default function DataAccessPanel() {
                     }
                   }}
                 >
-                  Generate New
+                  Generate New Password
                 </button>
               </div>
               <div className="font-mono text-sm text-gray-500 leading-relaxed">••••••••••••</div>
@@ -159,42 +159,44 @@ export default function DataAccessPanel() {
         </div>
       </div>
       {oneTimePassword && (
-        <div className="mx-8 mb-8 border-2 border-green-400 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 shadow-lg">
+        <div className="mx-8 mb-8 border-2 border-green-500 bg-green-50 rounded-lg p-6 shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <span className="text-3xl">🎉</span>
+              <span className="text-2xl">🔑</span>
               <div>
                 <div className="text-lg font-bold text-green-900">New Password Generated!</div>
                 <div className="text-sm text-green-700">Your database password has been reset</div>
               </div>
             </div>
             <button
-              className="text-sm px-4 py-2 border-2 border-green-600 rounded-lg bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-150 font-semibold"
+              className="text-sm px-4 py-2 bg-white border border-green-600 text-green-700 rounded-lg hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all font-semibold"
               onClick={() => setOneTimePassword(null)}
             >
               ✓ Got it
             </button>
           </div>
-          <div className="bg-white border-2 border-green-300 rounded-lg p-4 mb-3 shadow-sm">
+          <div className="bg-white border border-green-300 rounded-lg p-4 mb-4">
             <div className="flex items-center gap-4">
-              <code className="flex-1 font-mono text-lg text-gray-900 select-all font-semibold tracking-wide">
+              <code className="flex-1 font-mono text-base text-gray-900 select-all font-semibold">
                 {oneTimePassword}
               </code>
               <button
-                className="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-150 font-semibold text-sm shadow-sm hover:shadow"
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all font-semibold text-sm shadow-sm hover:shadow"
                 onClick={() => {
                   navigator.clipboard.writeText(oneTimePassword);
                   setCopied('OneTimePassword');
                   setTimeout(() => setCopied(''), 1500);
                 }}
               >
-                {copied === 'OneTimePassword' ? '✓ Copied!' : '📋 Copy'}
+                {copied === 'OneTimePassword' ? '✓ Copied!' : 'Copy Password'}
               </button>
             </div>
           </div>
-          <div className="flex items-start gap-2 text-xs leading-relaxed bg-yellow-50 border border-yellow-300 rounded-lg p-3">
-            <span className="text-base">⚠️</span>
-            <p className="text-yellow-800"><strong className="font-semibold">Important:</strong> Save this password now. For security, it won't be shown again. You'll need to generate a new one if lost.</p>
+          <div className="flex items-start gap-2 bg-yellow-50 border border-yellow-300 rounded-lg p-4">
+            <span className="text-lg">⚠️</span>
+            <p className="text-sm text-yellow-800 leading-relaxed">
+              <strong className="font-semibold">Save this password now.</strong> For security, it won't be shown again. You'll need to generate a new one if lost.
+            </p>
           </div>
         </div>
       )}
