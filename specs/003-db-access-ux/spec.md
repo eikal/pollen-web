@@ -56,8 +56,10 @@ Enable end users to securely access their own uploaded data in the database with
 ## Functional Requirements
 FR1. Data Access Panel
 - Provide a Data Access section under Settings showing: host, port, database name, schema name, username, password.
-- Display a copy-to-clipboard control for each field.
-- Include client instructions and sample commands.
+- Display each credential field with: left-aligned label (text-sm font-medium text-gray-600 uppercase tracking-wide) above value, inline copy button (right-aligned, text-xs px-3 py-1.5), consistent spacing (space-y-4 between fields).
+- Use code/monospace font (font-mono) for credential values.
+- Include helper text below fields explaining usage (text-xs text-gray-600).
+- Provide client instructions and sample CLI commands in code blocks with dark background (bg-gray-900) and syntax highlighting (text-green-400).
 
 FR2. Schema Isolation
 - Each user’s tables reside in a dedicated schema named `user_<uuid>` (or equivalent unique identifier).
@@ -78,7 +80,9 @@ FR5. Upload Page Separation
 
 FR6. Action Labels & Confirmations
 - Standardize action labels: Create Table, Upsert (by key), Delete Rows, Truncate Table, Drop Table.
-- Confirmations required for destructive actions (delete/truncate/drop).
+- Use semantic colors for actions: blue-600 for Create/Upsert (primary), red-600 for Delete/Truncate/Drop (destructive), with appropriate hover states and focus rings.
+- Confirmations required for destructive actions (delete/truncate/drop) using modal dialogs with clear warning messages.
+- Action buttons should be visually heavier: font-semibold, shadow-sm, with sufficient padding (px-4 py-2.5 minimum).
 
 FR7. Your Tables → DB Guidance
 - Add a guidance area explaining how to find DB credentials and connect.
@@ -95,8 +99,14 @@ FR9. Settings Redirect Behavior
 
 FR10. Production UI Polish
 - Ensure responsive design across devices.
-- Avoid overlapping components; spacing tokens consistent.
-- Accessible labels and focus states for interactive elements.
+- Use consistent spacing based on Tailwind's 8px base unit scale (p-2/4/6/8/12 for padding, m-2/4/6/8/12 for margins).
+- Apply typography scale for visual hierarchy: text-3xl/2xl for page titles (font-bold), text-xl for section headers (font-semibold), text-base for body text (font-medium), text-sm for labels (font-medium), text-xs for helper text (font-normal).
+- Use semantic color palette: blue-600 for primary actions, green-600 for success states, red-600 for destructive actions, yellow-50/600 for warnings, gray-50/100/600/900 for neutral UI elements.
+- Structure form fields with left-aligned labels above inputs, helper text below inputs, and consistent vertical spacing (space-y-2 for field groups).
+- Position copy buttons inline with credential values (right-aligned, text-xs, minimal padding px-3 py-1.5).
+- Avoid overlapping components; apply spacing tokens consistently throughout all UI sections.
+- Accessible labels and focus states (focus:ring-2 focus:ring-blue-500) for interactive elements.
+- Make important elements visually heavier: page titles use text-3xl + font-bold, primary action buttons use font-semibold + shadow-sm.
 
 ## Success Criteria
 - 95% of users locate and copy DB credentials in under 30 seconds.
@@ -118,9 +128,13 @@ FR10. Production UI Polish
 - Free plan limits: 1GB storage, up to 20 tables, basic operations (insert, upsert, delete, truncate, drop).
 
 ## Clarifications
-- [NEEDS CLARIFICATION: Should sheet selection allow creating multiple tables at once from one Excel file, or single-sheet per upload only?]
-- [NEEDS CLARIFICATION: Premium CTA target — contact form vs. mailto vs. scheduling link?]
-- [NEEDS CLARIFICATION: Credential regeneration policy — rotate username/password or only password reset?]
+
+### Session 2025-11-30
+- Q: What spacing base unit should the UI design system use to eliminate random px values? → A: 8px base unit using Tailwind's default scale (spacing-2 = 8px, -4 = 16px, -6 = 24px, -8 = 32px, -12 = 48px)
+- Q: What typography scale should establish visual weight hierarchy (titles, labels, body text)? → A: Tailwind text scale: text-sm (12px), text-base (16px), text-lg (18px), text-xl (20px), text-2xl (24px), text-3xl (30px) with font-medium/semibold/bold weights
+- Q: What color palette should be used for semantic states and UI consistency? → A: Tailwind's default palette with semantic mapping: blue-600 primary actions, green-600 success, red-600 destructive, yellow-50/600 warnings, gray-50/100/600/900 neutrals
+- Q: How should form fields be structured to avoid floating elements and maintain left-alignment? → A: Stack layout: left-aligned label (text-sm font-medium) above input, helper text (text-xs text-gray-600) below input, consistent vertical spacing (space-y-2 for field groups)
+- Q: Should copy buttons be inline with credential fields or separate action buttons? → A: Inline: small button positioned on the same row as the value (right-aligned), using text-xs with minimal padding (px-3 py-1.5) to maintain visual balance
 
 ## User Guidance: Connect to Your Data
 Provide step-by-step instructions within Settings → Data Access:
