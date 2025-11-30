@@ -10,9 +10,12 @@ export default function SettingsPage() {
         <title>Settings</title>
       </Head>
       <Nav />
-      <main className="container mx-auto px-4 py-6">
-        <h1 className="text-2xl font-semibold mb-4">Settings</h1>
-        <div className="grid grid-cols-1 gap-6">
+      <main className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8 max-w-5xl">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+            <p className="text-gray-600 mt-1">Manage your database access and account preferences</p>
+          </div>
           <DataAccessPanel />
         </div>
       </main>

@@ -140,7 +140,7 @@ async function enqueueUpload(data) {
  * Process an upload job.
  */
 async function processUploadJob(job) {
-    const { userId, sessionId, filePath, filename, tableName, operationType, conflictColumns } = job.data;
+    const { userId, sessionId, filePath, filename, tableName, operationType, conflictColumns, sheet } = job.data;
     log.info('Processing upload job', {
         jobId: job.id,
         userId,
@@ -180,7 +180,7 @@ async function processUploadJob(job) {
             },
         };
         // Parse file
-        columns = await fileParser.parseFile(filePath, parseOptions);
+        columns = await fileParser.parseFile(filePath, { ...parseOptions, sheet });
         await UploadSession.updateProgress(sessionId, 60);
         // Check if table exists
         const tableExists = await schemaService.tableExists(userId, tableName);

@@ -172,12 +172,17 @@ async function parseCSV(filePath, options) {
  * Note: Excel parsing is not streaming due to library limitations.
  */
 async function parseExcel(filePath, options) {
-    const { onRow, onComplete, onError, sampleSize = 1000 } = options;
+    const { onRow, onComplete, onError, sampleSize = 1000, sheet } = options;
     try {
         const workbook = new ExcelJS.Workbook();
         await workbook.xlsx.readFile(filePath);
-        // Get first worksheet
-        const worksheet = workbook.worksheets[0];
+        // Get worksheet by name or first
+        let worksheet = workbook.worksheets[0];
+        if (sheet) {
+            const found = workbook.worksheets.find((ws) => ws.name === sheet);
+            if (found)
+                worksheet = found;
+        }
         if (!worksheet) {
             throw new Error('Excel file has no worksheets');
         }

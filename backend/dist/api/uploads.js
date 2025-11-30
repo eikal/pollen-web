@@ -45,6 +45,7 @@ const schemaService = __importStar(require("../services/schema-service"));
 const etlService = __importStar(require("../services/etl-service"));
 const queue_1 = require("../services/queue");
 const log = __importStar(require("../services/log"));
+const exceljs_1 = __importDefault(require("exceljs"));
 const router = express_1.default.Router();
 function deriveTableName(filename) {
     const base = path_1.default.parse(filename).name;
@@ -57,7 +58,7 @@ function deriveTableName(filename) {
 }
 // POST /api/uploads - upload CSV/Excel and enqueue background job
 router.post('/', auth_1.authenticateJWT, upload_limits_1.checkQuotaBeforeUpload, upload_limits_1.upload.single('file'), async (req, res) => {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     try {
         if (!req.user) {
             return res.status(401).json({ success: false, errorCode: 'AUTHENTICATION_REQUIRED', message: 'Authentication required.' });
@@ -90,6 +91,7 @@ router.post('/', auth_1.authenticateJWT, upload_limits_1.checkQuotaBeforeUpload,
             tableName,
             operationType,
             conflictColumns,
+            sheet: ((_d = req.body) === null || _d === void 0 ? void 0 : _d.sheet) || undefined,
         };
         const queue = (0, queue_1.getUploadQueue)();
         await queue.add('upload', data, { jobId: sessionId });
@@ -240,3 +242,20 @@ router.delete('/tables/:table/data', auth_1.authenticateJWT, async (req, res) =>
     }
 });
 exports.default = router;
+// POST /api/uploads/excel/sheets - enumerate sheets in an uploaded Excel file
+router.post('/excel/sheets', auth_1.authenticateJWT, upload_limits_1.upload.single('file'), async (req, res) => {
+    try {
+        if (!req.user)
+            return res.status(401).json({ error: 'unauthorized' });
+        if (!req.file)
+            return res.status(400).json({ error: 'no file' });
+        const workbook = new exceljs_1.default.Workbook();
+        await workbook.xlsx.readFile(req.file.path);
+        const sheets = workbook.worksheets.map(ws => ws.name).filter(Boolean);
+        return res.json({ sheets });
+    }
+    catch (error) {
+        log.error('Excel sheet enumeration failed', { error: error.message });
+        return res.status(500).json({ error: 'failed to enumerate sheets' });
+    }
+});
