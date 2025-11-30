@@ -234,13 +234,13 @@
 
 ### Tasks
 
-- [ ] T060 [US3] Implement resetDbPassword() function in backend/src/services/user-credentials.ts using crypto.randomBytes(16).toString('base64')
-- [ ] T061 [US3] Implement POST /api/settings/data-access/reset-password endpoint in backend/src/api/data-access.ts
-- [ ] T062 [P] [US3] Add "Generate New Password" button to DataAccessPanel.tsx password field
-- [ ] T063 [P] [US3] Display one-time password reveal alert after reset with bg-green-50 border-green-500 styling
-- [ ] T064 [P] [US3] Add copy button to one-time password display
-- [ ] T065 [P] [US3] Add security warning text below one-time password: "Save now, won't be shown again"
-- [ ] T066 [US3] Implement dismiss button to close one-time password alert
+- [x] T060 [US3] Implement resetDbPassword() function in backend/src/services/user-credentials.ts using crypto.randomBytes(16).toString('base64')
+- [x] T061 [US3] Implement POST /api/settings/data-access/reset-password endpoint in backend/src/api/data-access.ts
+- [x] T062 [P] [US3] Add "Generate New Password" button to DataAccessPanel.tsx password field
+- [x] T063 [P] [US3] Display one-time password reveal alert after reset with bg-green-50 border-green-500 styling
+- [x] T064 [P] [US3] Add copy button to one-time password display
+- [x] T065 [P] [US3] Add security warning text below one-time password: "Save now, won't be shown again"
+- [x] T066 [US3] Implement dismiss button to close one-time password alert
 
 **Completion Criteria**: Password reset button functional, new password displayed once with copy button and warning, subsequent fetches show masked password
 
