@@ -146,10 +146,10 @@
 
 ### Tasks
 
-- [ ] T038 [P] [US5] Create GuidancePanel component in frontend/components/GuidancePanel.tsx with explanation text
-- [ ] T039 [P] [US5] Add "View DB Credentials" link button to GuidancePanel pointing to /settings
-- [ ] T040 [P] [US5] Style GuidancePanel with bg-blue-50 border-l-4 border-blue-500 p-6 following design system
-- [ ] T041 [US5] Add GuidancePanel to frontend/pages/my-data.tsx below TableList component
+- [x] T038 [P] [US5] Create GuidancePanel component in frontend/components/GuidancePanel.tsx with explanation text
+- [x] T039 [P] [US5] Add "View DB Credentials" link button to GuidancePanel pointing to /settings
+- [x] T040 [P] [US5] Style GuidancePanel with bg-blue-50 border-l-4 border-blue-500 p-6 following design system
+- [x] T041 [US5] Add GuidancePanel to frontend/pages/my-data.tsx below TableList component
 
 **Completion Criteria**: Guidance panel displays on Your Tables page with clear call-to-action linking to Settings
 
@@ -192,12 +192,12 @@
 
 ### Tasks
 
-- [ ] T050 [P] [US6] Fetch quota data from existing GET /api/quota endpoint in frontend pages
-- [ ] T051 [P] [US6] Display storage quota bar on Your Tables page using StorageQuotaBar component
-- [ ] T052 [P] [US6] Display table count "X / 20 tables" on Your Tables page
-- [ ] T053 [P] [US6] Add premium CTA card to Your Tables page with bg-gradient-to-r from-blue-600 to-indigo-600 styling
-- [ ] T054 [P] [US6] Implement "Contact Sales" button with mailto:sales@pollendata.com link
-- [ ] T055 [US6] Show premium CTA when user approaches limits (18+ tables or 900MB+ storage)
+- [x] T050 [P] [US6] Fetch quota data from existing GET /api/quota endpoint in frontend pages
+- [x] T051 [P] [US6] Display storage quota bar on Your Tables page using StorageQuotaBar component
+- [x] T052 [P] [US6] Display table count "X / 20 tables" on Your Tables page
+- [x] T053 [P] [US6] Add premium CTA card to Your Tables page with bg-gradient-to-r from-blue-600 to-indigo-600 styling
+- [x] T054 [P] [US6] Implement "Contact Sales" button with mailto:sales@pollendata.com link
+- [x] T055 [US6] Show premium CTA when user approaches limits (18+ tables or 900MB+ storage)
 
 **Completion Criteria**: Free plan limits visible to users, premium CTA displays when limits approached, clicking CTA opens email client with pre-filled subject
 
