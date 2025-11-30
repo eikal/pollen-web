@@ -7,6 +7,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-11
 - [if applicable, e.g., PostgreSQL, CoreData, files or N/A] (001-csv-upload-mvp)
 - Node.js 18 LTS, TypeScript 5.0 + Express 4.x (backend API), Next.js 14 (frontend), Multer (file uploads), Papa Parse (CSV parsing), ExcelJS (Excel parsing), pg (PostgreSQL client), BullMQ (job queue) (001-csv-upload-mvp)
 - PostgreSQL 14+ (shared instance with per-user schema isolation) (001-csv-upload-mvp)
+- Node.js 18 LTS, TypeScript 5.x (backend, frontend) + Express, Next.js, Multer, Papa Parse, ExcelJS, pg (003-db-access-ux)
+- PostgreSQL 14+ with per-user schema isolation (`user_<uuid>`) (003-db-access-ux)
 
 - **Backend**: Node.js + TypeScript + Express (001-simple-website-which)
 - **Frontend**: Next.js + React + TypeScript + Tailwind CSS (001-simple-website-which)
@@ -106,9 +108,9 @@ npm run migrate      # Run migrations
 **Error Messages**: ALWAYS use business-friendly language (see `docs/business-glossary.md`)
 
 ## Recent Changes
+- 003-db-access-ux: Added Node.js 18 LTS, TypeScript 5.x (backend, frontend) + Express, Next.js, Multer, Papa Parse, ExcelJS, pg
 - 001-csv-upload-mvp: Added Node.js 18 LTS, TypeScript 5.0 + Express 4.x (backend API), Next.js 14 (frontend), Multer (file uploads), Papa Parse (CSV parsing), ExcelJS (Excel parsing), pg (PostgreSQL client), BullMQ (job queue)
 - 001-csv-upload-mvp: Added Node.js 18 LTS, TypeScript 5.0 + Express 4.x (backend API), Next.js 14 (frontend), Multer (file uploads), Papa Parse (CSV parsing), ExcelJS (Excel parsing), pg (PostgreSQL client), BullMQ (job queue)
-- 001-csv-upload-mvp: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
 
 
 <!-- MANUAL ADDITIONS START -->

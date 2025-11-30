@@ -1,0 +1,85 @@
+openapi: 3.0.3
+info:
+  title: Pollen Web - DB Access & Upload UX
+  version: 1.0.0
+servers:
+  - url: /api
+paths:
+  /settings/data-access:
+    get:
+      summary: Get DB access credentials for current user
+      responses:
+        '200':
+          description: Credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  host: { type: string }
+                  port: { type: integer }
+                  database: { type: string }
+                  schema: { type: string }
+                  username: { type: string }
+                  passwordMasked: { type: boolean }
+        '401': { description: Unauthorized }
+  /settings/data-access/reset-password:
+    post:
+      summary: Reset DB password for current user
+      responses:
+        '200': { description: Password reset initiated }
+        '401': { description: Unauthorized }
+  /uploads/excel/sheets:
+    post:
+      summary: Enumerate sheets in an uploaded Excel file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Sheet list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sheets:
+                    type: array
+                    items: { type: string }
+  /uploads/preview:
+    post:
+      summary: Preview selected sheet or CSV
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fileId: { type: string }
+                sheet: { type: string }
+      responses:
+        '200': { description: Preview rows }
+  /uploads/finalize:
+    post:
+      summary: Create or update table
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                operation: { type: string, enum: [insert, upsert, delete, truncate, drop] }
+                tableName: { type: string }
+                keyColumn: { type: string }
+                sheet: { type: string }
+      responses:
+        '200': { description: Success }
