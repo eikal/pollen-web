@@ -75,8 +75,9 @@ export default function DataAccessPanel() {
                     <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{label}</span>
                   </div>
                   <button
-                    className="text-xs px-3 py-1.5 bg-white border border-gray-300 rounded-md hover:bg-blue-50 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-150 font-medium"
+                    className="text-xs px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all font-medium"
                     onClick={() => copy(label, value)}
+                    aria-label={`Copy ${label}`}
                   >
                     {copied === label ? '✓ Copied' : 'Copy'}
                   </button>
@@ -106,6 +107,7 @@ export default function DataAccessPanel() {
                       }
                     }
                   }}
+                  aria-label="Generate new database password"
                 >
                   Generate New Password
                 </button>
@@ -115,43 +117,44 @@ export default function DataAccessPanel() {
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-lg p-5 shadow-inner">
-          <div className="flex items-center justify-between mb-3">
+        <div className="bg-gray-900 rounded-lg p-6 shadow-inner">
+          <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold text-gray-100 uppercase tracking-wide">Quick Connect with psql</h3>
             <button
-              className="text-xs px-3 py-1.5 bg-gray-700 text-gray-100 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-150 font-medium"
+              className="text-xs px-4 py-2 bg-gray-700 text-gray-100 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all font-medium"
               onClick={() => copy('Command', psql)}
+              aria-label="Copy psql command"
             >
               {copied === 'Command' ? '✓ Copied' : 'Copy Command'}
             </button>
           </div>
           <pre className="text-sm text-green-400 overflow-auto leading-relaxed"><code>{psql}</code></pre>
-          <div className="mt-3 text-xs text-gray-400 leading-relaxed">
-            Then run: <code className="text-green-400 bg-gray-800 px-1.5 py-0.5 rounded">{sql}</code>
+          <div className="mt-4 text-xs text-gray-400 leading-relaxed">
+            Then run: <code className="text-green-400 bg-gray-800 px-2 py-1 rounded">{sql}</code>
           </div>
         </div>
 
         <div className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-6">
-          <h3 className="text-sm font-bold text-blue-900 uppercase tracking-wide mb-3">📘 Connect with DBeaver</h3>
+          <h3 className="text-sm font-bold text-blue-900 uppercase tracking-wide mb-4">📘 Connect with DBeaver</h3>
           <ol className="text-sm text-blue-800 space-y-2 list-decimal list-inside">
             <li>Open DBeaver and create a new PostgreSQL connection</li>
             <li>Copy and paste the Host, Port, Database, Username values above</li>
             <li>Enter your Password (or use "Generate New" to create one)</li>
             <li>Click "Test Connection" to verify</li>
-            <li>After connecting, run: <code className="bg-blue-100 px-1.5 py-0.5 rounded font-mono text-xs">SET search_path TO {creds.schema};</code></li>
-            <li>Now you can query your tables: <code className="bg-blue-100 px-1.5 py-0.5 rounded font-mono text-xs">SELECT * FROM your_table_name LIMIT 10;</code></li>
+            <li>After connecting, run: <code className="bg-blue-100 px-2 py-1 rounded font-mono text-xs">SET search_path TO {creds.schema};</code></li>
+            <li>Now you can query your tables: <code className="bg-blue-100 px-2 py-1 rounded font-mono text-xs">SELECT * FROM your_table_name LIMIT 10;</code></li>
           </ol>
         </div>
 
         <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6">
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-3">
             <span className="text-xl">🔒</span>
             <div className="flex-1">
               <h3 className="text-sm font-bold text-red-900 uppercase tracking-wide mb-2">Security Reminder</h3>
-              <ul className="text-sm text-red-800 space-y-1.5 list-disc list-inside">
+              <ul className="text-sm text-red-800 space-y-2 list-disc list-inside">
                 <li><strong className="font-semibold">Do not share your credentials</strong> with anyone</li>
                 <li>If credentials are compromised, use "Generate New Password" immediately</li>
-                <li>You can only access tables in your schema (<code className="bg-red-100 px-1 py-0.5 rounded font-mono text-xs">{creds.schema}</code>)</li>
+                <li>You can only access tables in your schema (<code className="bg-red-100 px-2 py-1 rounded font-mono text-xs">{creds.schema}</code>)</li>
                 <li>Changes made via SQL client are permanent - use caution with UPDATE and DELETE</li>
               </ul>
             </div>
@@ -159,10 +162,10 @@ export default function DataAccessPanel() {
         </div>
       </div>
       {oneTimePassword && (
-        <div className="mx-8 mb-8 border-2 border-green-500 bg-green-50 rounded-lg p-6 shadow-lg">
+        <div className="mx-8 mb-8 border-2 border-green-500 bg-green-50 rounded-lg p-6 shadow-lg" role="alert" aria-live="polite">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">🔑</span>
+              <span className="text-2xl" role="img" aria-label="Key">🔑</span>
               <div>
                 <div className="text-lg font-bold text-green-900">New Password Generated!</div>
                 <div className="text-sm text-green-700">Your database password has been reset</div>
@@ -171,13 +174,14 @@ export default function DataAccessPanel() {
             <button
               className="text-sm px-4 py-2 bg-white border border-green-600 text-green-700 rounded-lg hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all font-semibold"
               onClick={() => setOneTimePassword(null)}
+              aria-label="Dismiss password notification"
             >
               ✓ Got it
             </button>
           </div>
           <div className="bg-white border border-green-300 rounded-lg p-4 mb-4">
             <div className="flex items-center gap-4">
-              <code className="flex-1 font-mono text-base text-gray-900 select-all font-semibold">
+              <code className="flex-1 font-mono text-base text-gray-900 select-all font-semibold" aria-label="New database password">
                 {oneTimePassword}
               </code>
               <button
@@ -187,13 +191,14 @@ export default function DataAccessPanel() {
                   setCopied('OneTimePassword');
                   setTimeout(() => setCopied(''), 1500);
                 }}
+                aria-label="Copy new password to clipboard"
               >
                 {copied === 'OneTimePassword' ? '✓ Copied!' : 'Copy Password'}
               </button>
             </div>
           </div>
-          <div className="flex items-start gap-2 bg-yellow-50 border border-yellow-300 rounded-lg p-4">
-            <span className="text-lg">⚠️</span>
+          <div className="flex items-start gap-3 bg-yellow-50 border border-yellow-300 rounded-lg p-4">
+            <span className="text-lg" role="img" aria-label="Warning">⚠️</span>
             <p className="text-sm text-yellow-800 leading-relaxed">
               <strong className="font-semibold">Save this password now.</strong> For security, it won't be shown again. You'll need to generate a new one if lost.
             </p>
