@@ -42,7 +42,7 @@ export async function ensureDbUser(userId: string, schema: string): Promise<{ us
   return { username };
 }
 
-export async function resetDbPassword(userId: string): Promise<void> {
+export async function resetDbPassword(userId: string): Promise<string> {
   const pool = getPool();
   const client = await pool.connect();
   const username = `user_${pgIdent(userId)}`;
@@ -58,6 +58,8 @@ export async function resetDbPassword(userId: string): Promise<void> {
   } finally {
     client.release();
   }
+
+  return newPassword;
 }
 
 export default { ensureDbUser, resetDbPassword };
