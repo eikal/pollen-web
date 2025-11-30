@@ -15,7 +15,14 @@ export default function DataAccessPanel() {
   const [oneTimePassword, setOneTimePassword] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/settings/data-access')
+    const token = localStorage.getItem('pollen_token');
+    if (!token) {
+      setCreds(null);
+      return;
+    }
+    fetch('http://localhost:4000/api/settings/data-access', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then(setCreds)
       .catch(() => setCreds(null));
@@ -36,7 +43,6 @@ export default function DataAccessPanel() {
 
   return (
     <div className="border rounded p-4 space-y-3">
-      <h2 className="text-lg font-medium">Data Access</h2>
       <p className="text-sm text-gray-600">Use these credentials in DBeaver or psql. Your data lives in your personal schema.</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {([
@@ -67,7 +73,7 @@ export default function DataAccessPanel() {
             onClick={async () => {
               const token = localStorage.getItem('pollen_token');
               if (!token) return;
-              const res = await fetch('/api/settings/data-access/reset-password', {
+              const res = await fetch('http://localhost:4000/api/settings/data-access/reset-password', {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },
               });
