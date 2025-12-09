@@ -3,8 +3,10 @@ node_modules/
 
 # Build output
 /dist/
+backend/dist/
 /build/
 /.next/
+frontend/.next/
 /.vercel/
 
 # Logs
