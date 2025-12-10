@@ -1,18 +1,5 @@
 import { Activity, Database, GitBranch, AlertCircle, CheckCircle2, TrendingUp } from 'lucide-react';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const pipelineData = [
   { date: 'Mon', successful: 45, failed: 2 },
@@ -43,14 +30,15 @@ const assetTypeData = [
 
 export function Dashboard() {
   return (
-    <div className="p-6">
+    <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-gray-900 mb-2">Workspace Insights</h1>
-        <p className="text-gray-600">Monitor your Data Workspace health and pipeline performance</p>
+        <h1 className="text-gray-900 mb-2">Dashboard Overview</h1>
+        <p className="text-gray-600">Monitor your data infrastructure and pipeline performance</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-        <div className="bg-white p-5 rounded-lg border border-gray-200 stat-card">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-blue-50 rounded-lg">
               <Database className="w-6 h-6 text-blue-600" />
@@ -62,7 +50,7 @@ export function Dashboard() {
           <div className="text-green-600 text-sm mt-2">+12% from last month</div>
         </div>
 
-        <div className="bg-white p-5 rounded-lg border border-gray-200 stat-card">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-purple-50 rounded-lg">
               <GitBranch className="w-6 h-6 text-purple-600" />
@@ -70,11 +58,11 @@ export function Dashboard() {
             <Activity className="w-4 h-4 text-blue-600" />
           </div>
           <div className="text-3xl text-gray-900 mb-1">42</div>
-          <div className="text-gray-600 text-sm">Active Data Flows</div>
+          <div className="text-gray-600 text-sm">Active ETL Pipelines</div>
           <div className="text-blue-600 text-sm mt-2">38 running now</div>
         </div>
 
-        <div className="bg-white p-5 rounded-lg border border-gray-200 stat-card">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-green-50 rounded-lg">
               <CheckCircle2 className="w-6 h-6 text-green-600" />
@@ -85,7 +73,7 @@ export function Dashboard() {
           <div className="text-green-600 text-sm mt-2">Above target (95%)</div>
         </div>
 
-        <div className="bg-white p-5 rounded-lg border border-gray-200 stat-card">
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-orange-50 rounded-lg">
               <AlertCircle className="w-6 h-6 text-orange-600" />
@@ -97,9 +85,11 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
-        <div className="bg-white p-5 rounded-lg border border-gray-200">
-          <h3 className="text-gray-900 mb-4">Data Flow Execution Trends</h3>
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Pipeline Execution Trends */}
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h3 className="text-gray-900 mb-4">Pipeline Execution Trends</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={pipelineData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -122,7 +112,8 @@ export function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-lg border border-gray-200">
+        {/* Data Volume Processed */}
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <h3 className="text-gray-900 mb-4">Data Volume Processed (GB)</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={dataVolumeData}>
@@ -136,8 +127,10 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="bg-white p-5 rounded-lg border border-gray-200">
+      {/* Asset Distribution and Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Asset Type Distribution */}
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
           <h3 className="text-gray-900 mb-4">Asset Type Distribution</h3>
           <div className="flex items-center justify-center">
             <ResponsiveContainer width="100%" height={250}>
@@ -169,12 +162,13 @@ export function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-lg border border-gray-200">
-          <h3 className="text-gray-900 mb-4">Recent Data Flow Activity</h3>
+        {/* Recent Pipeline Activity */}
+        <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <h3 className="text-gray-900 mb-4">Recent Pipeline Activity</h3>
           <div className="space-y-4">
             {[
-              { name: 'Customer Data Flow', status: 'success', time: '2 min ago', duration: '4m 32s' },
-              { name: 'Sales Analytics Flow', status: 'success', time: '15 min ago', duration: '8m 12s' },
+              { name: 'Customer Data ETL', status: 'success', time: '2 min ago', duration: '4m 32s' },
+              { name: 'Sales Analytics Pipeline', status: 'success', time: '15 min ago', duration: '8m 12s' },
               { name: 'Inventory Sync Job', status: 'running', time: 'Started 5 min ago', duration: '—' },
               { name: 'Marketing Data Transform', status: 'success', time: '1 hour ago', duration: '12m 45s' },
               { name: 'Product Catalog Update', status: 'failed', time: '2 hours ago', duration: 'Failed at 3m' },

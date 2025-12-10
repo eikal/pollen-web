@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { Database, Lock, Mail, AlertCircle } from 'lucide-react';
 
 interface LoginProps {
@@ -11,7 +11,7 @@ export function Login({ onLogin }: LoginProps) {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
@@ -42,11 +42,11 @@ export function Login({ onLogin }: LoginProps) {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
             <Database className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-gray-900 mb-2">Data Workspace Hub</h1>
-          <p className="text-gray-600">Sign in to manage your Data Workspace</p>
+          <h1 className="text-gray-900 mb-2">Data Engineering Hub</h1>
+          <p className="text-gray-600">Sign in to manage your data infrastructure</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-7 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-gray-700 mb-2">
@@ -121,7 +121,9 @@ export function Login({ onLogin }: LoginProps) {
           </div>
         </div>
 
-        <p className="text-center text-gray-500 text-sm mt-6">Secure Data Workspace for your organization</p>
+        <p className="text-center text-gray-500 text-sm mt-6">
+          Secure data management platform for your organization
+        </p>
       </div>
     </div>
   );

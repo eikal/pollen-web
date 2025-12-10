@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Search, Database, FileJson, Cloud, HardDrive, Plus, Filter, MoreVertical, ExternalLink } from 'lucide-react';
 
 interface Asset {
@@ -15,13 +15,13 @@ interface Asset {
 const mockAssets: Asset[] = [
   {
     id: '1',
-    name: 'Customer Workspace DB',
+    name: 'Customer Database',
     type: 'database',
     status: 'active',
     size: '245 GB',
     lastUpdated: '2 hours ago',
     owner: 'Sarah Chen',
-    description: 'Primary customer Data Workspace with demographic and transaction history',
+    description: 'Primary customer data warehouse with demographic and transaction history',
   },
   {
     id: '2',
@@ -61,7 +61,7 @@ const mockAssets: Asset[] = [
     size: '89 GB',
     lastUpdated: '3 days ago',
     owner: 'Mike Johnson',
-    description: 'Legacy workspace data source – migration to the new Data Hub in progress',
+    description: 'Legacy customer relationship management database - migration in progress',
   },
   {
     id: '6',
@@ -99,17 +99,12 @@ export function DataAssets() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
 
-  const filteredAssets = useMemo(
-    () =>
-      mockAssets.filter((asset) => {
-        const matchesSearch =
-          asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          asset.description.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesFilter = filterType === 'all' || asset.type === filterType;
-        return matchesSearch && matchesFilter;
-      }),
-    [filterType, searchQuery]
-  );
+  const filteredAssets = mockAssets.filter((asset) => {
+    const matchesSearch = asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         asset.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = filterType === 'all' || asset.type === filterType;
+    return matchesSearch && matchesFilter;
+  });
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -140,12 +135,12 @@ export function DataAssets() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-8">
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-gray-900 mb-2">Data Assets</h1>
-            <p className="text-gray-600">Manage and monitor your Data Workspace connections</p>
+            <p className="text-gray-600">Manage and monitor your data infrastructure</p>
           </div>
           <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <Plus className="w-5 h-5" />
@@ -153,6 +148,7 @@ export function DataAssets() {
           </button>
         </div>
 
+        {/* Search and Filter */}
         <div className="flex gap-4">
           <div className="flex-1 relative">
             <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -181,22 +177,18 @@ export function DataAssets() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {/* Asset Cards Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredAssets.map((asset) => (
-          <div key={asset.id} className="bg-white p-5 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
+          <div key={asset.id} className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div
-                  className={`p-3 rounded-lg ${
-                    asset.type === 'database'
-                      ? 'bg-blue-50 text-blue-600'
-                      : asset.type === 'datalake'
-                        ? 'bg-purple-50 text-purple-600'
-                        : asset.type === 'api'
-                          ? 'bg-green-50 text-green-600'
-                          : 'bg-orange-50 text-orange-600'
-                  }`}
-                >
+                <div className={`p-3 rounded-lg ${
+                  asset.type === 'database' ? 'bg-blue-50 text-blue-600' :
+                  asset.type === 'datalake' ? 'bg-purple-50 text-purple-600' :
+                  asset.type === 'api' ? 'bg-green-50 text-green-600' :
+                  'bg-orange-50 text-orange-600'
+                }`}>
                   {getTypeIcon(asset.type)}
                 </div>
                 <div>
@@ -206,7 +198,7 @@ export function DataAssets() {
                   </span>
                 </div>
               </div>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Manage asset">
+              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                 <MoreVertical className="w-5 h-5 text-gray-400" />
               </button>
             </div>

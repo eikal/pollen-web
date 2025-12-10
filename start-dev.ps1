@@ -4,7 +4,7 @@
     Start all Pollen development servers (backend API, worker, and frontend)
 
 .DESCRIPTION
-    Launches backend API server, worker, and Next.js frontend in parallel.
+    Launches backend API server, worker, and Vite React frontend in parallel.
     Press Ctrl+C to stop all processes.
 
 .EXAMPLE
@@ -27,7 +27,7 @@ Write-Host "[POLLEN] Starting development servers..." -ForegroundColor Cyan
 # Clean up any orphaned processes from previous runs
 Write-Host "`n[CLEANUP] Checking for orphaned processes..." -ForegroundColor Yellow
 Stop-ProcessOnPort -Port 4000  # Backend API
-Stop-ProcessOnPort -Port 3000  # Frontend
+Stop-ProcessOnPort -Port 3000  # Frontend (Vite)
 
 # Check if Docker containers are running
 Write-Host "`n[CHECK] Checking Docker containers..." -ForegroundColor Yellow
