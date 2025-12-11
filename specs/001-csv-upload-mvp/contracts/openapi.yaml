@@ -1,0 +1,119 @@
+openapi: 3.0.3
+info:
+  title: Adapter Scaffold & Data Products API
+  version: 0.1.0
+servers:
+  - url: https://api.example.com
+paths:
+  /api/connections:
+    post:
+      summary: Create data source connection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, label, credentials]
+              properties:
+                type:
+                  type: string
+                  enum: [csv, google_sheets]
+                label:
+                  type: string
+                credentials:
+                  type: object
+                  description: Adapter-specific credential payload
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Validation error (business phrasing)
+    get:
+      summary: List connections
+      responses:
+        '200':
+          description: OK
+  /api/connections/{id}/schema:
+    get:
+      summary: Preview inferred schema
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': { description: OK }
+        '404': { description: Not found }
+  /api/data-products:
+    post:
+      summary: Create data product from template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [connection_id, type, template_id]
+              properties:
+                connection_id: { type: string }
+                type: { type: string, enum: [dashboard, report, calculator] }
+                template_id: { type: string }
+                refresh_frequency: { type: string }
+      responses:
+        '201': { description: Created }
+    get:
+      summary: List data products
+      responses:
+        '200': { description: OK }
+  /api/data-products/{id}:
+    get:
+      summary: Get product details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+        '404': { description: Not found }
+  /api/data-products/{id}/refresh:
+    post:
+      summary: Trigger manual refresh (rate limited)
+      responses:
+        '202': { description: Accepted }
+        '429': { description: Rate limit exceeded }
+  /api/data-products/{id}/duplicate:
+    post:
+      summary: Duplicate product for iteration
+      responses:
+        '201': { description: Created }
+  /api/data-products/{id}/metrics/{metricId}:
+    patch:
+      summary: Update KPI metric formula (versioned)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [formula_expression]
+              properties:
+                formula_expression: { type: string }
+      responses:
+        '200': { description: Updated }
+        '400': { description: Invalid formula }
+  /api/health:
+    get:
+      summary: Basic health probe
+      responses:
+        '200': { description: OK }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []

@@ -1,0 +1,44 @@
+name: Integration - Migrations
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  migrations:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd='pg_isready -U postgres' --health-interval=5s --health-timeout=5s --health-retries=10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..30}; do pg_isready -h localhost -U postgres && break || sleep 1; done
+
+      - name: Apply migrations
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d postgres -f backend/migrations/001_create_metadata.sql
+          psql -h localhost -U postgres -d postgres -f backend/migrations/002_seed_sample_data.sql
+
+      - name: Verify 'organizations' table
+        env:
+          PGPASSWORD: postgres
+        run: |
+          result=$(psql -h localhost -U postgres -d postgres -tAc "SELECT to_regclass('public.organizations');")
+          echo "got: $result"
+          if [ "$result" != "organizations" ]; then echo "organizations table missing"; exit 1; fi

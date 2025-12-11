@@ -1,0 +1,31 @@
+sku,product_name,category,quantity_on_hand,reorder_point,unit_cost,last_updated
+SKU-001,Widget Pro,Widgets,150,50,25.00,2025-11-25
+SKU-002,Widget Basic,Widgets,300,100,10.00,2025-11-25
+SKU-003,Widget Premium,Widgets,75,25,45.00,2025-11-25
+SKU-004,Gadget Basic,Gadgets,200,75,15.00,2025-11-25
+SKU-005,Gadget Premium,Gadgets,50,20,50.00,2025-11-25
+SKU-006,Gadget Pro,Gadgets,120,40,35.00,2025-11-25
+SKU-007,Tool Standard,Tools,80,30,20.00,2025-11-25
+SKU-008,Tool Professional,Tools,45,15,60.00,2025-11-25
+SKU-009,Tool Industrial,Tools,25,10,120.00,2025-11-25
+SKU-010,Supply Pack Small,Supplies,500,200,5.00,2025-11-25
+SKU-011,Supply Pack Medium,Supplies,350,150,12.00,2025-11-25
+SKU-012,Supply Pack Large,Supplies,200,80,25.00,2025-11-25
+SKU-013,Accessory Basic,Accessories,400,150,8.00,2025-11-25
+SKU-014,Accessory Premium,Accessories,180,60,22.00,2025-11-25
+SKU-015,Component A,Components,600,250,3.50,2025-11-25
+SKU-016,Component B,Components,450,200,4.25,2025-11-25
+SKU-017,Component C,Components,300,100,6.75,2025-11-25
+SKU-018,Part 101,Parts,800,300,2.00,2025-11-25
+SKU-019,Part 202,Parts,550,200,3.50,2025-11-25
+SKU-020,Part 303,Parts,400,150,5.00,2025-11-25
+SKU-021,Widget Deluxe,Widgets,60,20,75.00,2025-11-25
+SKU-022,Gadget Economy,Gadgets,250,100,8.00,2025-11-25
+SKU-023,Tool Starter,Tools,100,40,12.00,2025-11-25
+SKU-024,Supply Bundle,Supplies,150,50,30.00,2025-11-25
+SKU-025,Accessory Deluxe,Accessories,90,30,35.00,2025-11-25
+SKU-026,Component D,Components,350,125,5.50,2025-11-25
+SKU-027,Part 404,Parts,280,100,4.00,2025-11-25
+SKU-028,Widget Economy,Widgets,400,150,7.50,2025-11-25
+SKU-029,Gadget Deluxe,Gadgets,35,15,85.00,2025-11-25
+SKU-030,Tool Master,Tools,20,8,150.00,2025-11-25

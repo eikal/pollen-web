@@ -1,0 +1,1411 @@
+openapi: 3.0.3
+info:
+  title: Pollen CSV/Excel Upload API
+  description: |
+    API for uploading CSV/Excel files to PostgreSQL data warehouse with ETL operations.
+    
+    **MVP Scope**: File upload, table management, basic ETL operations (insert, upsert, delete, drop, truncate).
+    
+    **Free Plan Limits**:
+    - Maximum 20 tables per user
+    - 1GB total storage
+    - 50MB max file size
+    
+    **Business-Friendly UX**: All error messages use business-oriented language (see `/docs/business-glossary.md`).
+  version: 1.0.0
+  contact:
+    name: Pollen API Support
+    email: support@pollen.dev
+servers:
+  - url: http://localhost:4000
+    description: Local development server
+  - url: https://api.pollen.dev
+    description: Production server
+
+tags:
+  - name: Upload Flow
+    description: CSV/Excel file upload and preview
+  - name: Table Operations
+    description: List, preview, truncate, and drop tables
+  - name: ETL Operations
+    description: Insert, upsert, delete rows
+  - name: Storage Quota
+    description: Storage usage and limits
+
+security:
+  - BearerAuth: []
+
+paths:
+  # ==================== Upload Flow ====================
+  /api/uploads/start:
+    post:
+      tags:
+        - Upload Flow
+      summary: Start upload session
+      description: |
+        Initiates a new file upload session. Returns a session ID for subsequent chunk uploads.
+        
+        **Quota Check**: Pre-flight validation ensures user has available quota before accepting upload.
+      operationId: startUploadSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartUploadRequest'
+            examples:
+              csv:
+                summary: CSV file
+                value:
+                  filename: sales_data.csv
+                  fileSizeBytes: 5242880
+              excel:
+                summary: Excel file
+                value:
+                  filename: employees.xlsx
+                  fileSizeBytes: 2097152
+      responses:
+        '201':
+          description: Upload session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartUploadResponse'
+              example:
+                sessionId: 3f2a1b9c8d7e6f5a4b3c2d1e
+                status: uploading
+                uploadUrl: /api/uploads/3f2a1b9c8d7e6f5a4b3c2d1e/chunk
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '413':
+          $ref: '#/components/responses/FileTooLarge'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/uploads/{sessionId}/chunk:
+    post:
+      tags:
+        - Upload Flow
+      summary: Upload file chunk
+      description: |
+        Uploads a file chunk for an active session. Supports chunked uploads for large files.
+        
+        **Progress Updates**: Each chunk updates session progress percentage.
+      operationId: uploadFileChunk
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - chunk
+                - chunkIndex
+                - totalChunks
+              properties:
+                chunk:
+                  type: string
+                  format: binary
+                  description: File chunk data
+                chunkIndex:
+                  type: integer
+                  description: Zero-based chunk index
+                  minimum: 0
+                totalChunks:
+                  type: integer
+                  description: Total number of chunks
+                  minimum: 1
+      responses:
+        '200':
+          description: Chunk uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChunkUploadResponse'
+              example:
+                sessionId: 3f2a1b9c8d7e6f5a4b3c2d1e
+                chunkIndex: 0
+                totalChunks: 3
+                progressPct: 33
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/uploads/{sessionId}/complete:
+    post:
+      tags:
+        - Upload Flow
+      summary: Finalize upload
+      description: |
+        Marks upload session as complete and triggers file parsing. File is processed asynchronously.
+        
+        **Next Step**: Poll `/api/uploads/{sessionId}/preview` to see when schema preview is ready.
+      operationId: completeUpload
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Upload finalized, processing started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompleteUploadResponse'
+              example:
+                sessionId: 3f2a1b9c8d7e6f5a4b3c2d1e
+                status: processing
+                message: File uploaded successfully. Preparing preview...
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/uploads/{sessionId}/preview:
+    get:
+      tags:
+        - Upload Flow
+      summary: Get schema preview
+      description: |
+        Returns inferred column types and sample data (first 100 rows) from uploaded file.
+        
+        **Polling**: Call this endpoint after upload completes. Status changes from `processing` → `completed` when preview is ready.
+      operationId: getSchemaPreview
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Schema preview ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchemaPreview'
+              examples:
+                csv:
+                  summary: CSV preview
+                  value:
+                    sessionId: 3f2a1b9c8d7e6f5a4b3c2d1e
+                    status: completed
+                    filename: sales_data.csv
+                    rowCount: 1000
+                    columns:
+                      - name: order_id
+                        type: TEXT
+                        nullable: false
+                      - name: customer_name
+                        type: TEXT
+                        nullable: true
+                      - name: quantity
+                        type: INTEGER
+                        nullable: false
+                      - name: unit_price
+                        type: DECIMAL
+                        nullable: false
+                      - name: order_date
+                        type: DATE
+                        nullable: false
+                    sampleRows:
+                      - order_id: ORD001
+                        customer_name: John Doe
+                        quantity: 5
+                        unit_price: 29.99
+                        order_date: '2025-11-01'
+                      - order_id: ORD002
+                        customer_name: Jane Smith
+                        quantity: 3
+                        unit_price: 49.99
+                        order_date: '2025-11-02'
+        '202':
+          description: Preview still processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewProcessing'
+              example:
+                sessionId: 3f2a1b9c8d7e6f5a4b3c2d1e
+                status: processing
+                progressPct: 75
+                message: Analyzing your data...
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/uploads/{sessionId}/create:
+    post:
+      tags:
+        - Upload Flow
+      summary: Create table from upload
+      description: |
+        Creates a new table in user's schema and loads all data from uploaded file.
+        
+        **Table Naming**: If table name already exists, system appends timestamp suffix.
+      operationId: createTableFromUpload
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTableRequest'
+            examples:
+              basic:
+                summary: Basic table creation
+                value:
+                  tableName: sales_data
+              withOverrides:
+                summary: With type overrides
+                value:
+                  tableName: employees
+                  columnTypeOverrides:
+                    employee_id: TEXT
+                    salary: DECIMAL
+      responses:
+        '201':
+          description: Table created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTableResponse'
+              example:
+                tableId: 42
+                tableName: sales_data
+                rowsInserted: 1000
+                sizeMb: 0.25
+                message: Your data is ready! 1,000 records loaded into sales_data.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/QuotaExceeded'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ==================== Table Operations ====================
+  /api/tables:
+    get:
+      tags:
+        - Table Operations
+      summary: List user tables
+      description: |
+        Returns all tables in user's schema with metadata (row count, size, last updated).
+      operationId: listUserTables
+      responses:
+        '200':
+          description: Table list retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableListResponse'
+              example:
+                tables:
+                  - id: 1
+                    tableName: sales_data
+                    rowCount: 1000
+                    sizeMb: 0.25
+                    lastUpdatedAt: '2025-11-28T10:30:00Z'
+                    createdAt: '2025-11-20T15:45:00Z'
+                  - id: 2
+                    tableName: employees
+                    rowCount: 150
+                    sizeMb: 0.05
+                    lastUpdatedAt: '2025-11-27T09:15:00Z'
+                    createdAt: '2025-11-18T12:00:00Z'
+                totalTables: 2
+                totalSizeMb: 0.30
+                quota:
+                  tablesUsed: 2
+                  tablesLimit: 20
+                  storageUsedMb: 0.30
+                  storageLimitMb: 1024
+                  storageUsedPct: 0.03
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/tables/{tableName}/preview:
+    get:
+      tags:
+        - Table Operations
+      summary: Preview table data
+      description: |
+        Returns first 100 rows from table for quick data validation.
+        
+        **Use Case**: Verify data before connecting external BI tools.
+      operationId: previewTableData
+      parameters:
+        - $ref: '#/components/parameters/TableName'
+      responses:
+        '200':
+          description: Table preview retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TablePreviewResponse'
+              example:
+                tableName: sales_data
+                rowCount: 1000
+                columns:
+                  - order_id
+                  - customer_name
+                  - quantity
+                  - unit_price
+                  - order_date
+                rows:
+                  - order_id: ORD001
+                    customer_name: John Doe
+                    quantity: 5
+                    unit_price: 29.99
+                    order_date: '2025-11-01'
+                  - order_id: ORD002
+                    customer_name: Jane Smith
+                    quantity: 3
+                    unit_price: 49.99
+                    order_date: '2025-11-02'
+                previewLimit: 100
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/tables/{tableName}/truncate:
+    post:
+      tags:
+        - Table Operations
+      summary: Truncate table
+      description: |
+        Deletes all rows from table while preserving structure.
+        
+        **Requires Confirmation**: User must provide table name in request body to confirm destructive action.
+      operationId: truncateTable
+      parameters:
+        - $ref: '#/components/parameters/TableName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmationRequest'
+            example:
+              confirmTableName: sales_data
+      responses:
+        '200':
+          description: Table truncated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TruncateTableResponse'
+              example:
+                tableName: sales_data
+                rowsDeleted: 1000
+                message: All data cleared from sales_data. Table structure preserved.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/tables/{tableName}/drop:
+    post:
+      tags:
+        - Table Operations
+      summary: Drop table
+      description: |
+        Permanently deletes table and all data.
+        
+        **Requires Confirmation**: User must type exact table name to confirm this irreversible action.
+      operationId: dropTable
+      parameters:
+        - $ref: '#/components/parameters/TableName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmationRequest'
+            example:
+              confirmTableName: sales_data
+      responses:
+        '200':
+          description: Table dropped successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DropTableResponse'
+              example:
+                tableName: sales_data
+                message: Table 'sales_data' removed. This action cannot be undone.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ==================== ETL Operations ====================
+  /api/etl/insert:
+    post:
+      tags:
+        - ETL Operations
+      summary: Insert rows
+      description: |
+        Appends new rows to existing table. Does NOT check for duplicates.
+        
+        **Use Case**: Append new transactions to historical data.
+      operationId: insertRows
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertRequest'
+            example:
+              tableName: transactions
+              rows:
+                - transaction_id: TXN005
+                  transaction_date: '2025-11-28'
+                  amount: 149.99
+                  category: Sales
+                - transaction_id: TXN006
+                  transaction_date: '2025-11-28'
+                  amount: -50.00
+                  category: Refund
+      responses:
+        '200':
+          description: Rows inserted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InsertResponse'
+              example:
+                operationId: 123
+                tableName: transactions
+                rowsInserted: 2
+                message: 2 records added to transactions.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/etl/upsert:
+    post:
+      tags:
+        - ETL Operations
+      summary: Upsert rows
+      description: |
+        Updates existing rows by key column, inserts new rows.
+        
+        **Key Column Validation**: Rows with NULL in key column are skipped and counted in response.
+      operationId: upsertRows
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertRequest'
+            example:
+              tableName: inventory
+              keyColumn: sku
+              rows:
+                - sku: PROD001
+                  product_name: Widget A
+                  quantity_on_hand: 150
+                - sku: PROD002
+                  product_name: Widget B
+                  quantity_on_hand: 75
+      responses:
+        '200':
+          description: Upsert completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpsertResponse'
+              example:
+                operationId: 124
+                tableName: inventory
+                rowsUpdated: 1
+                rowsInserted: 1
+                rowsSkipped: 0
+                message: Updated 1 record and added 1 new record to inventory.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/etl/delete:
+    post:
+      tags:
+        - ETL Operations
+      summary: Delete rows
+      description: |
+        Removes rows matching comma-separated ID list.
+        
+        **ID Validation**: Malformed IDs are rejected before execution.
+      operationId: deleteRows
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRequest'
+            examples:
+              singleId:
+                summary: Delete single row
+                value:
+                  tableName: customers
+                  idColumn: customer_id
+                  ids: ['CUST001']
+              multipleIds:
+                summary: Delete multiple rows
+                value:
+                  tableName: customers
+                  idColumn: customer_id
+                  ids: ['CUST001', 'CUST002', 'CUST003']
+      responses:
+        '200':
+          description: Rows deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+              example:
+                operationId: 125
+                tableName: customers
+                rowsDeleted: 2
+                rowsNotFound: 1
+                message: Removed 2 of 3 records (1 not found).
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/etl/history:
+    get:
+      tags:
+        - ETL Operations
+      summary: Get operation history
+      description: |
+        Returns recent ETL operations (insert, upsert, delete, drop, truncate) with audit trail.
+        
+        **Default Limit**: Last 100 operations.
+      operationId: getETLHistory
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of operations to return
+          schema:
+            type: integer
+            default: 100
+            minimum: 1
+            maximum: 500
+        - name: tableName
+          in: query
+          description: Filter by table name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Operation history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ETLHistoryResponse'
+              example:
+                operations:
+                  - id: 125
+                    operationType: delete
+                    tableName: customers
+                    status: success
+                    rowsAffected: 2
+                    errorMessage: null
+                    createdAt: '2025-11-28T14:30:00Z'
+                  - id: 124
+                    operationType: upsert
+                    tableName: inventory
+                    status: success
+                    rowsAffected: 2
+                    errorMessage: null
+                    createdAt: '2025-11-28T12:15:00Z'
+                  - id: 123
+                    operationType: insert
+                    tableName: transactions
+                    status: failed
+                    rowsAffected: 0
+                    errorMessage: Column mismatch. Expected 'amount' column.
+                    createdAt: '2025-11-27T16:45:00Z'
+                totalOperations: 3
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ==================== Storage Quota ====================
+  /api/quota:
+    get:
+      tags:
+        - Storage Quota
+      summary: Get current storage usage
+      description: |
+        Returns storage quota information for authenticated user.
+        
+        **Warning Threshold**: 80% usage triggers upgrade prompt.
+      operationId: getStorageQuota
+      responses:
+        '200':
+          description: Quota information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaResponse'
+              examples:
+                normal:
+                  summary: Normal usage
+                  value:
+                    userId: user123
+                    totalTables: 5
+                    totalSizeMb: 103.5
+                    limitMb: 1024
+                    usedPct: 10.1
+                    tablesLimit: 20
+                    warning: null
+                    lastCalculatedAt: '2025-11-28T15:00:00Z'
+                warning:
+                  summary: Near capacity
+                  value:
+                    userId: user456
+                    totalTables: 18
+                    totalSizeMb: 850.0
+                    limitMb: 1024
+                    usedPct: 83.0
+                    tablesLimit: 20
+                    warning: Storage 83% full (850MB/1GB). Consider upgrading or deleting unused tables.
+                    lastCalculatedAt: '2025-11-28T15:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+# ==================== Components ====================
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /api/auth/login
+
+  parameters:
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      description: Upload session ID
+      schema:
+        type: string
+        pattern: '^[a-f0-9]{32}$'
+        example: 3f2a1b9c8d7e6f5a4b3c2d1e
+    
+    TableName:
+      name: tableName
+      in: path
+      required: true
+      description: Table name in user's schema
+      schema:
+        type: string
+        pattern: '^[a-z_][a-z0-9_]*$'
+        minLength: 1
+        maxLength: 63
+        example: sales_data
+
+  schemas:
+    # ==================== Upload Flow Schemas ====================
+    StartUploadRequest:
+      type: object
+      required:
+        - filename
+        - fileSizeBytes
+      properties:
+        filename:
+          type: string
+          description: Original filename (CSV or Excel)
+          pattern: '^.+\.(csv|xlsx)$'
+          example: sales_data.csv
+        fileSizeBytes:
+          type: integer
+          description: Total file size in bytes
+          minimum: 1
+          maximum: 52428800
+          example: 5242880
+
+    StartUploadResponse:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: Unique session ID for this upload
+          example: 3f2a1b9c8d7e6f5a4b3c2d1e
+        status:
+          type: string
+          enum: [uploading]
+          example: uploading
+        uploadUrl:
+          type: string
+          description: Endpoint for chunk uploads
+          example: /api/uploads/3f2a1b9c8d7e6f5a4b3c2d1e/chunk
+
+    ChunkUploadResponse:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          example: 3f2a1b9c8d7e6f5a4b3c2d1e
+        chunkIndex:
+          type: integer
+          example: 0
+        totalChunks:
+          type: integer
+          example: 3
+        progressPct:
+          type: integer
+          description: Upload progress percentage
+          minimum: 0
+          maximum: 100
+          example: 33
+
+    CompleteUploadResponse:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          example: 3f2a1b9c8d7e6f5a4b3c2d1e
+        status:
+          type: string
+          enum: [processing]
+          example: processing
+        message:
+          type: string
+          example: File uploaded successfully. Preparing preview...
+
+    SchemaPreview:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          example: 3f2a1b9c8d7e6f5a4b3c2d1e
+        status:
+          type: string
+          enum: [completed]
+          example: completed
+        filename:
+          type: string
+          example: sales_data.csv
+        rowCount:
+          type: integer
+          description: Total rows in file
+          example: 1000
+        columns:
+          type: array
+          items:
+            $ref: '#/components/schemas/ColumnDefinition'
+        sampleRows:
+          type: array
+          description: First 5 rows for preview
+          items:
+            type: object
+            additionalProperties: true
+          maxItems: 5
+
+    PreviewProcessing:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          example: 3f2a1b9c8d7e6f5a4b3c2d1e
+        status:
+          type: string
+          enum: [processing]
+          example: processing
+        progressPct:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 75
+        message:
+          type: string
+          example: Analyzing your data...
+
+    ColumnDefinition:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Column name
+          example: order_id
+        type:
+          type: string
+          enum: [TEXT, INTEGER, DECIMAL, DATE, BOOLEAN]
+          description: Inferred data type
+          example: TEXT
+        nullable:
+          type: boolean
+          description: Whether column allows NULL values
+          example: false
+
+    CreateTableRequest:
+      type: object
+      required:
+        - tableName
+      properties:
+        tableName:
+          type: string
+          description: Desired table name (must be unique in user's schema)
+          pattern: '^[a-z_][a-z0-9_]*$'
+          minLength: 1
+          maxLength: 63
+          example: sales_data
+        columnTypeOverrides:
+          type: object
+          description: Override inferred column types (optional)
+          additionalProperties:
+            type: string
+            enum: [TEXT, INTEGER, DECIMAL, DATE, BOOLEAN]
+          example:
+            employee_id: TEXT
+            salary: DECIMAL
+
+    CreateTableResponse:
+      type: object
+      properties:
+        tableId:
+          type: integer
+          description: Internal table ID
+          example: 42
+        tableName:
+          type: string
+          description: Final table name (may have timestamp suffix if duplicate)
+          example: sales_data
+        rowsInserted:
+          type: integer
+          description: Number of rows loaded
+          example: 1000
+        sizeMb:
+          type: number
+          format: float
+          description: Table size in megabytes
+          example: 0.25
+        message:
+          type: string
+          description: Business-friendly success message
+          example: Your data is ready! 1,000 records loaded into sales_data.
+
+    # ==================== Table Operations Schemas ====================
+    TableListResponse:
+      type: object
+      properties:
+        tables:
+          type: array
+          items:
+            $ref: '#/components/schemas/TableMetadata'
+        totalTables:
+          type: integer
+          description: Total number of tables
+          example: 5
+        totalSizeMb:
+          type: number
+          format: float
+          description: Total storage used across all tables
+          example: 103.5
+        quota:
+          $ref: '#/components/schemas/QuotaSummary'
+
+    TableMetadata:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Internal table ID
+          example: 1
+        tableName:
+          type: string
+          description: Table name
+          example: sales_data
+        rowCount:
+          type: integer
+          description: Number of rows
+          example: 1000
+        sizeMb:
+          type: number
+          format: float
+          description: Table size in megabytes
+          example: 0.25
+        lastUpdatedAt:
+          type: string
+          format: date-time
+          description: Last data modification timestamp
+          example: '2025-11-28T10:30:00Z'
+        createdAt:
+          type: string
+          format: date-time
+          description: Table creation timestamp
+          example: '2025-11-20T15:45:00Z'
+
+    TablePreviewResponse:
+      type: object
+      properties:
+        tableName:
+          type: string
+          example: sales_data
+        rowCount:
+          type: integer
+          description: Total rows in table
+          example: 1000
+        columns:
+          type: array
+          description: Column names
+          items:
+            type: string
+          example: [order_id, customer_name, quantity, unit_price, order_date]
+        rows:
+          type: array
+          description: First 100 rows
+          items:
+            type: object
+            additionalProperties: true
+          maxItems: 100
+        previewLimit:
+          type: integer
+          description: Maximum rows returned
+          example: 100
+
+    ConfirmationRequest:
+      type: object
+      required:
+        - confirmTableName
+      properties:
+        confirmTableName:
+          type: string
+          description: Exact table name to confirm destructive action
+          example: sales_data
+
+    TruncateTableResponse:
+      type: object
+      properties:
+        tableName:
+          type: string
+          example: sales_data
+        rowsDeleted:
+          type: integer
+          description: Number of rows removed
+          example: 1000
+        message:
+          type: string
+          example: All data cleared from sales_data. Table structure preserved.
+
+    DropTableResponse:
+      type: object
+      properties:
+        tableName:
+          type: string
+          example: sales_data
+        message:
+          type: string
+          example: Table 'sales_data' removed. This action cannot be undone.
+
+    # ==================== ETL Operations Schemas ====================
+    InsertRequest:
+      type: object
+      required:
+        - tableName
+        - rows
+      properties:
+        tableName:
+          type: string
+          description: Target table name
+          example: transactions
+        rows:
+          type: array
+          description: Rows to insert
+          items:
+            type: object
+            additionalProperties: true
+          minItems: 1
+
+    InsertResponse:
+      type: object
+      properties:
+        operationId:
+          type: integer
+          description: ETL operation ID for audit trail
+          example: 123
+        tableName:
+          type: string
+          example: transactions
+        rowsInserted:
+          type: integer
+          description: Number of rows added
+          example: 2
+        message:
+          type: string
+          example: 2 records added to transactions.
+
+    UpsertRequest:
+      type: object
+      required:
+        - tableName
+        - keyColumn
+        - rows
+      properties:
+        tableName:
+          type: string
+          description: Target table name
+          example: inventory
+        keyColumn:
+          type: string
+          description: Column to use for matching (must exist in table)
+          example: sku
+        rows:
+          type: array
+          description: Rows to upsert
+          items:
+            type: object
+            additionalProperties: true
+          minItems: 1
+
+    UpsertResponse:
+      type: object
+      properties:
+        operationId:
+          type: integer
+          example: 124
+        tableName:
+          type: string
+          example: inventory
+        rowsUpdated:
+          type: integer
+          description: Number of existing rows updated
+          example: 1
+        rowsInserted:
+          type: integer
+          description: Number of new rows inserted
+          example: 1
+        rowsSkipped:
+          type: integer
+          description: Rows with NULL in key column (not processed)
+          example: 0
+        message:
+          type: string
+          example: Updated 1 record and added 1 new record to inventory.
+
+    DeleteRequest:
+      type: object
+      required:
+        - tableName
+        - idColumn
+        - ids
+      properties:
+        tableName:
+          type: string
+          description: Target table name
+          example: customers
+        idColumn:
+          type: string
+          description: Column to match IDs against
+          example: customer_id
+        ids:
+          type: array
+          description: List of IDs to delete
+          items:
+            type: string
+          minItems: 1
+          example: ['CUST001', 'CUST002', 'CUST003']
+
+    DeleteResponse:
+      type: object
+      properties:
+        operationId:
+          type: integer
+          example: 125
+        tableName:
+          type: string
+          example: customers
+        rowsDeleted:
+          type: integer
+          description: Number of rows removed
+          example: 2
+        rowsNotFound:
+          type: integer
+          description: IDs not found in table
+          example: 1
+        message:
+          type: string
+          example: Removed 2 of 3 records (1 not found).
+
+    ETLHistoryResponse:
+      type: object
+      properties:
+        operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ETLOperationRecord'
+        totalOperations:
+          type: integer
+          description: Total number of operations returned
+          example: 3
+
+    ETLOperationRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Operation ID
+          example: 125
+        operationType:
+          type: string
+          enum: [insert, upsert, delete, drop, truncate]
+          description: Type of ETL operation
+          example: delete
+        tableName:
+          type: string
+          description: Target table name
+          example: customers
+        status:
+          type: string
+          enum: [success, failed]
+          description: Operation outcome
+          example: success
+        rowsAffected:
+          type: integer
+          description: Number of rows modified
+          example: 2
+        errorMessage:
+          type: string
+          nullable: true
+          description: Business-friendly error message (null if success)
+          example: null
+        createdAt:
+          type: string
+          format: date-time
+          description: Operation timestamp
+          example: '2025-11-28T14:30:00Z'
+
+    # ==================== Storage Quota Schemas ====================
+    QuotaResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: User ID
+          example: user123
+        totalTables:
+          type: integer
+          description: Number of tables created
+          example: 5
+        totalSizeMb:
+          type: number
+          format: float
+          description: Total storage used (MB)
+          example: 103.5
+        limitMb:
+          type: integer
+          description: Storage limit (MB)
+          example: 1024
+        usedPct:
+          type: number
+          format: float
+          description: Storage usage percentage
+          minimum: 0
+          maximum: 100
+          example: 10.1
+        tablesLimit:
+          type: integer
+          description: Maximum tables allowed
+          example: 20
+        warning:
+          type: string
+          nullable: true
+          description: Warning message if approaching limits (null if below 80%)
+          example: Storage 83% full (850MB/1GB). Consider upgrading or deleting unused tables.
+        lastCalculatedAt:
+          type: string
+          format: date-time
+          description: Last quota calculation timestamp
+          example: '2025-11-28T15:00:00Z'
+
+    QuotaSummary:
+      type: object
+      description: Quota summary included in table list
+      properties:
+        tablesUsed:
+          type: integer
+          example: 2
+        tablesLimit:
+          type: integer
+          example: 20
+        storageUsedMb:
+          type: number
+          format: float
+          example: 0.30
+        storageLimitMb:
+          type: integer
+          example: 1024
+        storageUsedPct:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 0.03
+
+    # ==================== Error Schemas ====================
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Business-friendly error message
+          example: File too large. Please split into smaller files or compress.
+        code:
+          type: string
+          description: Error code for programmatic handling
+          example: FILE_TOO_LARGE
+        details:
+          type: object
+          description: Additional error context (optional)
+          additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: Invalid request (malformed input, validation error)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalidFilename:
+              summary: Invalid filename
+              value:
+                error: File type not supported. Please upload CSV or Excel (.xlsx) files only.
+                code: INVALID_FILE_TYPE
+            invalidTableName:
+              summary: Invalid table name
+              value:
+                error: Table name must start with a letter and contain only lowercase letters, numbers, and underscores.
+                code: INVALID_TABLE_NAME
+            missingKeyColumn:
+              summary: Upsert key column missing
+              value:
+                error: Key column 'product_id' not found in table.
+                code: KEY_COLUMN_NOT_FOUND
+
+    Unauthorized:
+      description: Authentication required or invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: Please sign in to continue.
+            code: UNAUTHORIZED
+
+    QuotaExceeded:
+      description: Storage or table quota exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            storageLimit:
+              summary: Storage limit reached
+              value:
+                error: Storage limit reached. Please delete tables or upgrade to continue.
+                code: STORAGE_QUOTA_EXCEEDED
+                details:
+                  currentSizeMb: 1024
+                  limitMb: 1024
+            tableLimit:
+              summary: Table limit reached
+              value:
+                error: Table limit reached (20 of 20 used). Please delete unused tables or upgrade.
+                code: TABLE_LIMIT_EXCEEDED
+                details:
+                  currentTables: 20
+                  tablesLimit: 20
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            sessionNotFound:
+              summary: Upload session not found
+              value:
+                error: Upload session not found or expired.
+                code: SESSION_NOT_FOUND
+            tableNotFound:
+              summary: Table not found
+              value:
+                error: Table 'sales_data' does not exist in your workspace.
+                code: TABLE_NOT_FOUND
+
+    FileTooLarge:
+      description: File exceeds maximum size limit (50MB)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: File too large. Please split into smaller files or compress.
+            code: FILE_TOO_LARGE
+            details:
+              fileSizeBytes: 52428801
+              maxSizeBytes: 52428800
+
+    InternalServerError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: Something went wrong while processing your request. Our team has been notified.
+            code: INTERNAL_SERVER_ERROR
