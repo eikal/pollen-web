@@ -18,11 +18,11 @@ const sizeClasses: Record<ButtonSize, string> = {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'btn btn-primary',
-  outline: 'btn btn-outline',
-  danger: 'btn btn-danger',
-  warning: 'btn btn-warning',
-  ghost: 'btn btn-ghost',
+  primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500/50 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200',
+  outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:ring-2 focus:ring-gray-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200',
+  danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500/50 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200',
+  warning: 'bg-orange-600 text-white hover:bg-orange-700 focus:ring-2 focus:ring-orange-500/50 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200',
+  ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-gray-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200',
 };
 
 export function Button({
@@ -37,15 +37,15 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim()}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg font-medium focus:outline-none ${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim()}
       disabled={loading || rest.disabled}
       {...rest}
     >
       {loading && (
-        <span className="inline-block w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
+        <span className="inline-block w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
       )}
       {!loading && iconLeft}
-      <span>{children}</span>
+      {children}
       {!loading && iconRight}
     </button>
   );

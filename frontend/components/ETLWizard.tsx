@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import Card from './ui/Card';
 import { Button } from './ui/Button';
 import Input from './ui/Input';
@@ -55,7 +54,6 @@ export default function ETLWizard({ onClose }: { onClose?: () => void }) {
   const [destinations, setDestinations] = useState<Connector[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter();
 
   useEffect(() => {
     loadConnectors();
@@ -122,7 +120,7 @@ export default function ETLWizard({ onClose }: { onClose?: () => void }) {
         const err = await res.json();
         throw new Error(err.error || 'Failed to create template');
       }
-      router.push('/etl');
+      if (onClose) onClose();
     } catch (e: any) {
       setError(e.message);
     } finally {

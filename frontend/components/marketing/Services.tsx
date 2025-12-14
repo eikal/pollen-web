@@ -1,44 +1,39 @@
-import { Database, GitBranch, Shield, BarChart3, Upload, Clock } from 'lucide-react';
-import { MarketingRoute } from './Layout';
+import { Database, Upload, Clock, Cloud, ExternalLink, Sparkles } from 'lucide-react';
 
-interface ServicesProps {
-  onNavigate: (route: MarketingRoute) => void;
-}
-
-const services = [
+export function Services() {
+  const services = [
   {
     icon: <Upload className="w-5 h-5 text-blue-600" />,
-    title: 'Data Workspace setup',
-    desc: 'Upload CSV/Excel and get queryable tables with schema previews.',
+    title: 'Manual uploads (Free)',
+    desc: 'We guide you through CSV/Excel setup, table previews, and safe deletes.',
   },
   {
-    icon: <GitBranch className="w-5 h-5 text-purple-600" />,
-    title: 'Data Flows (ETL)',
-    desc: 'Visualize, schedule, and monitor pipelines with alerts and retries.',
+    icon: <Clock className="w-5 h-5 text-indigo-600" />,
+    title: 'Scheduled refresh (Starter)',
+    desc: 'Set recurring uploads with reminders so your records stay fresh.',
+  },
+  {
+    icon: <Sparkles className="w-5 h-5 text-purple-600" />,
+    title: 'Query materialization (Starter)',
+    desc: 'We help you schedule SQL snapshots for faster dashboards.',
+  },
+  {
+    icon: <Cloud className="w-5 h-5 text-cyan-600" />,
+    title: 'Cloud imports (Starter+)',
+    desc: 'Guided setup for Google Sheets/Drive CSV; expand to Dropbox/S3 as you grow.',
   },
   {
     icon: <Database className="w-5 h-5 text-green-600" />,
-    title: 'Connections',
-    desc: 'Secure connectors for databases, files, and APIs with credentials vault.',
+    title: 'Database connectors (Professional)',
+    desc: 'We configure Postgres/MySQL/SQL Server with governed credentials and previews.',
   },
   {
-    icon: <Shield className="w-5 h-5 text-emerald-600" />,
-    title: 'Governance',
-    desc: 'Role-based access, audit logs, isolated schemas per workspace.',
-  },
-  {
-    icon: <BarChart3 className="w-5 h-5 text-orange-600" />,
-    title: 'Insights',
-    desc: 'Business-friendly views and summaries for non-SQL users.',
-  },
-  {
-    icon: <Clock className="w-5 h-5 text-gray-600" />,
-    title: 'Reliability',
-    desc: 'Health dashboards, run history, and proactive quota warnings.',
+    icon: <ExternalLink className="w-5 h-5 text-amber-600" />,
+    title: 'APIs & webhooks (Enterprise)',
+    desc: 'Managed onboarding for Shopify/Stripe/HubSpot-style APIs with SLAs and isolation.',
   },
 ];
 
-export function Services({ onNavigate }: ServicesProps) {
   return (
     <div className="max-w-6xl mx-auto px-6 py-16">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-10">
@@ -47,7 +42,7 @@ export function Services({ onNavigate }: ServicesProps) {
           <h1 className="text-3xl font-semibold text-gray-900 leading-tight">Everything you need to ship data faster</h1>
           <p className="text-gray-600">Built for business users with enterprise-grade controls.</p>
         </div>
-        <button onClick={() => onNavigate('pricing')} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">See pricing</button>
+        <a href="/pricing" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">See pricing</a>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {services.map((service) => (

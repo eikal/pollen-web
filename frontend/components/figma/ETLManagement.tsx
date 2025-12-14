@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Play, Pause, RefreshCw, Settings, Clock, CheckCircle2, XCircle, AlertCircle, Plus, Calendar } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Play, Pause, RefreshCw, Settings, Clock, CheckCircle2, XCircle, AlertCircle, Plus, Calendar, X } from 'lucide-react';
+import ETLWizard from '../ETLWizard';
 
 interface Pipeline {
   id: string;
@@ -115,6 +117,8 @@ const mockPipelines: Pipeline[] = [
 
 export function ETLManagement() {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [showPipelineWizard, setShowPipelineWizard] = useState(false);
+  console.log('ETLManagement render - showPipelineWizard:', showPipelineWizard);
 
   const filteredPipelines = mockPipelines.filter((pipeline) => {
     if (selectedStatus === 'all') return true;
@@ -167,7 +171,10 @@ export function ETLManagement() {
             <h1 className="text-gray-900 mb-2">ETL Pipeline Management</h1>
             <p className="text-gray-600">Monitor and control your data transformation pipelines</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button onClick={() => {
+            console.log('Create Pipeline button clicked');
+            setShowPipelineWizard(true);
+          }} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             <Plus className="w-5 h-5" />
             Create Pipeline
           </button>
@@ -277,6 +284,25 @@ export function ETLManagement() {
           <p className="text-gray-600">No pipelines match the selected status</p>
         </div>
       )}
+
+      {showPipelineWizard &&
+        createPortal(
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-xl">
+              <button
+                onClick={() => setShowPipelineWizard(false)}
+                className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg transition-colors z-10"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+              <div className="p-6">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">Create Data Flow</h2>
+                <ETLWizard onClose={() => setShowPipelineWizard(false)} />
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

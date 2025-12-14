@@ -11,7 +11,7 @@ import type {
   APIError,
 } from './types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 export async function createProduct(params: CreateProductParams): Promise<DataProduct> {
   const response = await fetch(`${API_BASE}/api/data-products`, {

@@ -1,11 +1,7 @@
 import { Users, ShieldCheck, Rocket } from 'lucide-react';
-import { MarketingRoute } from './Layout';
+import { Link } from 'react-router-dom';
 
-interface AboutProps {
-  onNavigate: (route: MarketingRoute) => void;
-}
-
-export function About({ onNavigate }: AboutProps) {
+export function About() {
   return (
     <div className="max-w-6xl mx-auto px-6 py-16">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -15,8 +11,8 @@ export function About({ onNavigate }: AboutProps) {
           <p className="text-gray-700 leading-relaxed">Our mission is to help teams launch governed Data Workspaces without heavy engineering lifts. Upload files, connect sources, and run ETL pipelines with business-friendly controls.</p>
           <p className="text-gray-700 leading-relaxed">We focus on transparency: clear quotas, predictable pricing, and safeguards before anything breaks.</p>
           <div className="flex flex-wrap gap-3 pt-2">
-            <button onClick={() => onNavigate('services')} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Explore services</button>
-            <button onClick={() => onNavigate('pricing')} className="px-4 py-2 bg-white text-gray-800 border border-gray-200 rounded-lg hover:border-blue-200 hover:text-blue-600 transition-colors">View pricing</button>
+            <Link to="/services" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Explore services</Link>
+            <Link to="/pricing" className="px-4 py-2 bg-white text-gray-800 border border-gray-200 rounded-lg hover:border-blue-200 hover:text-blue-600 transition-colors">View pricing</Link>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
