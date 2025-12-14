@@ -1,33 +1,37 @@
 import { Check } from 'lucide-react';
-import { MarketingRoute } from './Layout';
+import { Link } from 'react-router-dom';
 
-interface PricingProps {
-  onNavigate: (route: MarketingRoute) => void;
-}
+type PlanName = 'Free' | 'Starter' | 'Professional' | 'Enterprise';
 
-const plans = [
+const plans: Array<{ name: PlanName; price: string; desc: string; features: string[]; highlighted?: boolean }> = [
+  {
+    name: 'Free',
+    price: '$0',
+    desc: 'Upload a few files and explore your Data Workspace.',
+    features: ['1 Data Workspace', '1GB data volume', 'Manual CSV/Excel uploads', 'Table preview (100 rows)'],
+  },
   {
     name: 'Starter',
     price: '$49/mo',
-    desc: 'For small teams validating data workflows.',
-    features: ['2 Data Workspaces', 'Up to 50GB storage', '3 Data Flows', 'Email support'],
+    desc: 'Automate refreshes and share clean tables.',
+    features: ['2 Data Workspaces', '50GB data volume', 'Scheduled file refresh (1)', 'Query materialization (daily)', 'Email support'],
+    highlighted: true,
   },
   {
-    name: 'Growth',
-    price: '$149/mo',
-    desc: 'For teams shipping governed data experiences.',
-    features: ['5 Data Workspaces', 'Up to 250GB storage', '10 Data Flows', 'Role-based access', 'Priority support'],
-    highlighted: true,
+    name: 'Professional',
+    price: '$199/mo',
+    desc: 'Ship governed data flows with database connectors.',
+    features: ['5 Data Workspaces', '250GB data volume', 'Cloud storage imports', 'Database connectors', 'Role-based access', 'Priority support'],
   },
   {
     name: 'Enterprise',
     price: 'Custom',
-    desc: 'For orgs needing SSO, audit, and isolation.',
-    features: ['Unlimited Workspaces', 'Isolated schemas', 'SSO + SCIM', 'Audit logs', 'Dedicated success'],
+    desc: 'For orgs needing SSO, audit, and private deployments.',
+    features: ['Unlimited Workspaces', 'Private cloud/SOC2 options', 'API & webhook sources', 'SSO + SCIM', 'Audit logs', 'Dedicated success'],
   },
 ];
 
-export function Pricing({ onNavigate }: PricingProps) {
+export function Pricing() {
   return (
     <div className="max-w-6xl mx-auto px-6 py-16">
       <div className="text-center mb-12 space-y-3">
@@ -35,7 +39,7 @@ export function Pricing({ onNavigate }: PricingProps) {
         <h1 className="text-3xl font-semibold text-gray-900">Transparent plans for business users</h1>
         <p className="text-gray-600">Choose a plan that fits your Data Workspace needs. Upgrade anytime.</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {plans.map((plan) => (
           <div
             key={plan.name}
@@ -57,15 +61,107 @@ export function Pricing({ onNavigate }: PricingProps) {
                 </li>
               ))}
             </ul>
-            <button
-              onClick={() => onNavigate('login')}
-              className={`w-full py-3 rounded-lg font-medium transition-colors ${plan.highlighted ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-900 text-white hover:bg-gray-800'}`}
+            <Link
+              to="/login"
+              className={`w-full py-3 rounded-lg font-medium transition-colors text-center block ${plan.highlighted ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-900 text-white hover:bg-gray-800'}`}
             >
               Get started
-            </button>
+            </Link>
           </div>
         ))}
+      </div>
+
+      <div className="mt-12 bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+          <div>
+            <p className="text-blue-600 font-semibold">Data asset coverage</p>
+            <h2 className="text-xl font-semibold text-gray-900">Pick the plan that matches your sources</h2>
+            <p className="text-gray-600 text-sm">Business language, clear limits. Upgrade only when you need automation.</p>
+          </div>
+          <Link to="/login" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Start free</Link>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm text-gray-800">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left py-3 pr-4">Asset type</th>
+                {plans.map((p) => (
+                  <th key={p.name} className="text-left py-3 px-3">{p.name}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {assetRows.map((row) => (
+                <tr key={row.label}>
+                  <td className="py-3 pr-4 font-medium text-gray-900">{row.label}</td>
+                  {plans.map((plan) => (
+                    <td key={plan.name} className="py-3 px-3 text-gray-700">
+                      {row.availability[plan.name] || <span className="text-gray-400">—</span>}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
+
+const assetRows: Array<{ label: string; availability: Record<PlanName, string> }> = [
+  {
+    label: 'Manual file upload',
+    availability: {
+      Free: 'Included',
+      Starter: 'Included',
+      Professional: 'Included',
+      Enterprise: 'Included',
+    },
+  },
+  {
+    label: 'Scheduled file refresh',
+    availability: {
+      Free: '—',
+      Starter: '1 schedule',
+      Professional: 'Multiple schedules',
+      Enterprise: 'Unlimited + SLAs',
+    },
+  },
+  {
+    label: 'Query materialization',
+    availability: {
+      Free: '—',
+      Starter: 'Daily snapshots',
+      Professional: 'Hourly or daily',
+      Enterprise: 'Custom cadence',
+    },
+  },
+  {
+    label: 'Cloud storage import',
+    availability: {
+      Free: '—',
+      Starter: 'Google Sheets/Drive CSV',
+      Professional: 'Drive/Dropbox/S3',
+      Enterprise: 'All + private buckets',
+    },
+  },
+  {
+    label: 'External databases',
+    availability: {
+      Free: '—',
+      Starter: '—',
+      Professional: 'Postgres/MySQL/SQL Server',
+      Enterprise: 'Private connectors + VPC',
+    },
+  },
+  {
+    label: 'API & webhook sources',
+    availability: {
+      Free: '—',
+      Starter: '—',
+      Professional: '—',
+      Enterprise: 'Shopify/Stripe/HubSpot and custom',
+    },
+  },
+];

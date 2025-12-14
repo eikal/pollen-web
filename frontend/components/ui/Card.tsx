@@ -30,14 +30,19 @@ export function Card({
 }: CardProps) {
   return (
     <div
-      className={`ui-card ${interactive ? 'cursor-pointer' : ''} ${paddingMap[padding]} ${className}`.trim()}
+      className={`
+        bg-white rounded-xl border border-gray-200 shadow-sm
+        ${interactive ? 'cursor-pointer hover:shadow-md hover:border-gray-300 transition-all duration-200' : ''}
+        ${paddingMap[padding]}
+        ${className}
+      `.trim()}
       onClick={onClick}
     >
       {(title || actions) && (
-        <div className="flex items-start justify-between mb-3">
+        <div className="flex items-start justify-between mb-4">
           <div>
-            {title && <h2 className="text-lg font-semibold tracking-tight">{title}</h2>}
-            {subtitle && <p className="mt-1 text-xs text-gray-500">{subtitle}</p>}
+            {title && <h2 className="text-lg font-semibold text-gray-900">{title}</h2>}
+            {subtitle && <p className="mt-1 text-sm text-gray-600">{subtitle}</p>}
           </div>
           {actions && <div className="flex items-center gap-2">{actions}</div>}
         </div>

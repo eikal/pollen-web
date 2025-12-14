@@ -1,17 +1,19 @@
 import { LayoutDashboard, Database, GitBranch, LogOut, User } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
-  activeView: 'dashboard' | 'assets' | 'etl';
-  onViewChange: (view: 'dashboard' | 'assets' | 'etl') => void;
   user: { email: string; name: string };
   onLogout: () => void;
 }
 
-export function Sidebar({ activeView, onViewChange, user, onLogout }: SidebarProps) {
+export function Sidebar({ user, onLogout }: SidebarProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const menuItems = [
-    { id: 'dashboard' as const, label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'assets' as const, label: 'Data Assets', icon: Database },
-    { id: 'etl' as const, label: 'ETL Pipelines', icon: GitBranch },
+    { id: 'dashboard', path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'assets', path: '/assets', label: 'Data Assets', icon: Database },
+    { id: 'etl', path: '/etl', label: 'ETL Pipelines', icon: GitBranch },
   ];
 
   return (
@@ -22,12 +24,13 @@ export function Sidebar({ activeView, onViewChange, user, onLogout }: SidebarPro
       <nav className="flex-1 p-4">
         {menuItems.map((item) => {
           const Icon = item.icon;
+          const isActive = location.pathname === item.path || (location.pathname === '/' && item.id === 'dashboard');
           return (
             <button
               key={item.id}
-              onClick={() => onViewChange(item.id)}
+              onClick={() => navigate(item.path)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-colors ${
-                activeView === item.id
+                isActive
                   ? 'bg-blue-50 text-blue-600'
                   : 'text-gray-700 hover:bg-gray-50'
               }`}

@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Database, FileJson, Cloud, HardDrive, Plus, Filter, MoreVertical, ExternalLink } from 'lucide-react';
+import ConnectionWizard from '../ConnectionWizard';
 
 interface Asset {
   id: string;
@@ -98,6 +100,7 @@ const mockAssets: Asset[] = [
 export function DataAssets() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
+  const navigate = useNavigate();
 
   const filteredAssets = mockAssets.filter((asset) => {
     const matchesSearch = asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -142,7 +145,10 @@ export function DataAssets() {
             <h1 className="text-gray-900 mb-2">Data Assets</h1>
             <p className="text-gray-600">Manage and monitor your data infrastructure</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button
+            onClick={() => navigate('/assets/new')}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <Plus className="w-5 h-5" />
             Add Asset
           </button>
@@ -230,6 +236,50 @@ export function DataAssets() {
           <p className="text-gray-600">Try adjusting your search or filters</p>
         </div>
       )}
+    </div>
+  );
+}
+
+export function DataAssetCreatePage() {
+  const navigate = useNavigate();
+  const orgId = 'org_placeholder';
+  const workspaceId = 'ws_placeholder';
+
+  return (
+    <div className="min-h-full bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <button
+            onClick={() => navigate('/assets')}
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-700 mb-4 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Data Assets
+          </button>
+          <div className="flex items-start justify-between">
+            <div>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold mb-3">
+                Add Data Source
+              </span>
+              <h1 className="text-4xl font-semibold text-gray-900 mb-2">Connect a new source to your Data Workspace</h1>
+              <p className="text-gray-600 text-lg">Choose a source, configure access, and preview the structure before saving.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Wizard Card */}
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-8">
+          <ConnectionWizard
+            orgId={orgId}
+            workspaceId={workspaceId}
+            onComplete={() => navigate('/assets')}
+            onCancel={() => navigate('/assets')}
+          />
+        </div>
+      </div>
     </div>
   );
 }
